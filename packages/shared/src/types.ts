@@ -31,6 +31,39 @@ export interface GeoPoint {
   lng: number;
 }
 
+// ─── Pricing tiers ───────────────────────────────────────────────────────────
+export type PricingTier = 'standard' | 'basic_promotion' | 'active_promotion' | 'tournament' | 'founding';
+
+export const PRICING_TIERS: { tier: PricingTier; label: string; feeCents: number; description: string }[] = [
+  { tier: 'standard',         label: 'Standard',           feeCents: 275, description: 'Base rate per completed booking' },
+  { tier: 'basic_promotion',  label: 'Basic Promotion',    feeCents: 225, description: 'Teezy listed on your website/booking page' },
+  { tier: 'active_promotion', label: 'Active Promotion',   feeCents: 200, description: 'Signage on course + staff mentions to players' },
+  { tier: 'tournament',       label: 'Tournament Partner', feeCents: 175, description: 'Run mini tournament + social media promotion' },
+  { tier: 'founding',         label: 'Founding Course',    feeCents: 150, description: 'Founding partner rate — locked forever' },
+];
+
+export type StaffRole = 'pro_shop' | 'manager' | 'owner';
+
+export interface CourseStaff {
+  id: string;
+  courseId: string;
+  userId: string;
+  role: StaffRole;
+  createdAt: Date;
+}
+
+export interface CourseEvent {
+  id: string;
+  courseId: string;
+  title: string;
+  description: string | null;
+  imageUrl: string | null;
+  eventDate: Date;
+  isPublished: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 export interface Course {
   id: string;
   name: string;
@@ -47,6 +80,7 @@ export interface Course {
   websiteUrl: string | null;
   phoneNumber: string | null;
   stripeAccountId: string | null;
+  pricingTier: PricingTier;
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date;

@@ -129,7 +129,15 @@ paymentsRouter.post(
       return c.json({ error: { code: 'NOT_FOUND', message: 'Course not found' } }, 404);
     }
 
-    const platformFeeCents = 125;
+    // Tiered platform fee based on course's promotional tier
+    const TIER_FEES: Record<string, number> = {
+      founding:         150,
+      tournament:       175,
+      active_promotion: 200,
+      basic_promotion:  225,
+      standard:         275,
+    };
+    const platformFeeCents = TIER_FEES[course.pricingTier ?? 'standard'] ?? 275;
     const totalAmount = booking.totalPriceInCents + platformFeeCents;
 
     const intentParams: Stripe.PaymentIntentCreateParams = {

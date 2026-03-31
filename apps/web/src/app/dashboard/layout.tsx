@@ -15,16 +15,27 @@ const COLORS = {
   gray900: '#111827',
 };
 
-const navLinks = [
+const MANAGER_LINKS = [
   { href: '/dashboard', label: 'Overview', icon: '📊', exact: true },
   { href: '/dashboard/availability', label: 'Availability', icon: '📅', exact: false },
+  { href: '/dashboard/events', label: 'Events', icon: '🎉', exact: false },
   { href: '/dashboard/analytics', label: 'Analytics', icon: '📈', exact: false },
+  { href: '/dashboard/profile', label: 'Course Profile', icon: '🏌️', exact: false },
+  { href: '/dashboard/billing', label: 'Billing', icon: '💰', exact: false },
   { href: '/dashboard/connect', label: 'Stripe Connect', icon: '💳', exact: false },
   { href: '/dashboard/settings', label: 'Settings', icon: '⚙️', exact: false },
 ];
 
+const PROSHOP_LINKS = [
+  { href: '/dashboard/proshop', label: 'Today', icon: '📋', exact: true },
+  { href: '/dashboard/availability', label: 'Availability', icon: '📅', exact: false },
+];
+
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const isProShop = pathname.startsWith('/dashboard/proshop');
+  const navLinks = isProShop ? PROSHOP_LINKS : MANAGER_LINKS;
+  const dashboardLabel = isProShop ? 'Pro Shop' : 'Manager Dashboard';
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh', background: COLORS.gray50 }}>
@@ -44,12 +55,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         }}
       >
         {/* Logo */}
-        <div
-          style={{
-            padding: '1.25rem 1.25rem',
-            borderBottom: `1px solid ${COLORS.gray200}`,
-          }}
-        >
+        <div style={{ padding: '1.25rem', borderBottom: `1px solid ${COLORS.gray200}` }}>
           <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             <span style={{ fontSize: '1.1rem' }}>⛳</span>
             <div>
@@ -67,14 +73,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   textTransform: 'uppercase',
                 }}
               >
-                Course Dashboard
+                {dashboardLabel}
               </span>
             </div>
           </Link>
         </div>
 
         {/* Navigation */}
-        <nav style={{ flex: 1, padding: '0.75rem 0.75rem' }}>
+        <nav style={{ flex: 1, padding: '0.75rem' }}>
           <p
             style={{
               fontSize: '0.68rem',
@@ -108,17 +114,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   fontWeight: isActive ? 700 : 500,
                   marginBottom: 2,
                   background: isActive ? COLORS.greenPale : 'transparent',
-                  transition: 'background 0.12s, color 0.12s',
                 }}
               >
-                <span
-                  style={{
-                    fontSize: '1rem',
-                    width: 22,
-                    textAlign: 'center',
-                    opacity: isActive ? 1 : 0.7,
-                  }}
-                >
+                <span style={{ fontSize: '1rem', width: 22, textAlign: 'center', opacity: isActive ? 1 : 0.7 }}>
                   {link.icon}
                 </span>
                 {link.label}
@@ -137,6 +135,47 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               </Link>
             );
           })}
+
+          {/* Switch view link */}
+          <div style={{ marginTop: '1.5rem', paddingTop: '1rem', borderTop: `1px solid ${COLORS.gray200}` }}>
+            {isProShop ? (
+              <Link
+                href="/dashboard"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.6rem',
+                  padding: '0.65rem 0.75rem',
+                  borderRadius: 8,
+                  textDecoration: 'none',
+                  color: COLORS.gray600,
+                  fontSize: '0.85rem',
+                  fontWeight: 500,
+                }}
+              >
+                <span style={{ fontSize: '1rem', width: 22, textAlign: 'center', opacity: 0.6 }}>🔀</span>
+                Manager View
+              </Link>
+            ) : (
+              <Link
+                href="/dashboard/proshop"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.6rem',
+                  padding: '0.65rem 0.75rem',
+                  borderRadius: 8,
+                  textDecoration: 'none',
+                  color: COLORS.gray600,
+                  fontSize: '0.85rem',
+                  fontWeight: 500,
+                }}
+              >
+                <span style={{ fontSize: '1rem', width: 22, textAlign: 'center', opacity: 0.6 }}>🔀</span>
+                Pro Shop View
+              </Link>
+            )}
+          </div>
         </nav>
 
         {/* Footer */}

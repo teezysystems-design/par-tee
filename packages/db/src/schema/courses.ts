@@ -4,12 +4,25 @@ import {
   decimal,
   integer,
   jsonb,
+  pgEnum,
   pgTable,
   text,
   timestamp,
   uuid,
 } from 'drizzle-orm/pg-core';
 import { users as teezyUsers } from './users';
+
+// ─── Pricing tiers ───────────────────────────────────────────────────────────
+export const pricingTierEnum = pgEnum('pricing_tier', [
+  'standard',          // $2.75 / booking
+  'basic_promotion',   // $2.25 / booking — listed on website/booking page
+  'active_promotion',  // $2.00 / booking — signage + staff mentions
+  'tournament',        // $1.75 / booking — mini tournament + social promo
+  'founding',          // $1.50 / booking — founding course, locked forever
+]);
+
+// ─── Staff roles ─────────────────────────────────────────────────────────────
+export const staffRoleEnum = pgEnum('staff_role', ['pro_shop', 'manager', 'owner']);
 
 // PostGIS geography type (read-only in Drizzle; managed by DB trigger)
 const geography = customType<{ data: string }>({
@@ -34,8 +47,37 @@ export const courses = pgTable('courses', {
   websiteUrl: text('website_url'),
   phoneNumber: text('phone_number'),
   stripeAccountId: text('stripe_account_id'),
+  pricingTier: pricingTierEnum('pricing_tier').notNull().default('standard'),
   createdByUserId: uuid('created_by_user_id').references(() => teezyUsers.id, { onDelete: 'set null' }),
   isActive: boolean('is_active').notNull().default(true),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+});
+
+// ─── Staff ───────────────────────────────────────────────────────────────────
+export const courseStaff = pgTable('course_staff', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  courseId: uuid('course_id')
+    .notNull()
+    .references(() => courses.id, { onDelete: 'cascade' }),
+  userId: uuid('user_id')
+    .notNull()
+    .references(() => teezyUsers.id, { onDelete: 'cascade' }),
+  role: staffRoleEnum('role').notNull().default('pro_shop'),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+});
+
+// ─── Course events / promotions ──────────────────────────────────────────────
+export const courseEvents = pgTable('course_events', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  courseId: uuid('course_id')
+    .notNull()
+    .references(() => courses.id, { onDelete: 'cascade' }),
+  title: text('title').notNull(),
+  description: text('description'),
+  imageUrl: text('image_url'),
+  eventDate: timestamp('event_date', { withTimezone: true }).notNull(),
+  isPublished: boolean('is_published').notNull().default(true),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
 });
