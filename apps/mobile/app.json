@@ -6,22 +6,27 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "scheme": "teezy",
+    "description": "Book golf tee times based on your mood. Find courses that match how you want to play.",
+    "keywords": ["golf", "tee time", "booking", "mood"],
+    "privacy": "https://teezy.app/privacy",
     "userInterfaceStyle": "automatic",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#1a7f4b"
+      "backgroundColor": "#1a6b2a"
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.teezy.app"
+      "bundleIdentifier": "com.teezy.app",
+      "buildNumber": "1"
     },
     "android": {
+      "package": "com.teezy.app",
+      "versionCode": 1,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#1a7f4b"
-      },
-      "package": "com.teezy.app"
+        "backgroundColor": "#1a6b2a"
+      }
     },
     "web": {
       "bundler": "metro",

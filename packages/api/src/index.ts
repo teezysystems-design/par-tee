@@ -9,6 +9,11 @@ import { coursesRouter } from './routes/courses';
 import { usersRouter } from './routes/users';
 import { bookingsRouter } from './routes/bookings';
 import { socialRouter } from './routes/social';
+import { waitlistRouter } from './routes/waitlist';
+import { availabilityRouter } from './routes/availability';
+import { analyticsRouter } from './routes/analytics';
+import { paymentsRouter } from './routes/payments';
+import { scorecardsRouter } from './routes/scorecards';
 
 const app = new Hono();
 
@@ -35,6 +40,11 @@ app.route('/v1/courses', coursesRouter);
 app.route('/v1/users', usersRouter);
 app.route('/v1/bookings', bookingsRouter);
 app.route('/v1/social', socialRouter);
+app.route('/v1/waitlist', waitlistRouter);
+app.route('/v1/availability', availabilityRouter);
+app.route('/v1/analytics', analyticsRouter);
+app.route('/v1/payments', paymentsRouter);
+app.route('/v1/scorecards', scorecardsRouter);
 
 // 404
 app.notFound((c) => {
