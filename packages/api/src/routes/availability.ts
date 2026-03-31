@@ -2,7 +2,7 @@ import { Hono } from 'hono';
 import { zValidator } from '@hono/zod-validator';
 import { z } from 'zod';
 import { eq, and, sql, gte, lt } from 'drizzle-orm';
-import { db, teeTimeSlots } from '@teezy/db';
+import { db, teeTimeSlots, courses } from '@teezy/db';
 import { authMiddleware } from '../middleware/auth';
 
 export const availabilityRouter = new Hono();
@@ -24,6 +24,29 @@ const listSlotsQuerySchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
   pageSize: z.coerce.number().int().min(1).max(100).default(20),
 });
+
+/** Resolve internal user id from supabaseUserId */
+async function resolveUserId(supabaseUserId: string): Promise<string | null> {
+  const [row] = await db
+    .select({ id: sql<string>`id` })
+    .from(sql`users`)
+    .where(sql`supabase_user_id = ${supabaseUserId}`)
+    .limit(1);
+  return row?.id ?? null;
+}
+
+/** Return 403 if the user does not own the course (ownership is enforced when createdByUserId is set). */
+async function assertCourseOwner(courseId: string, userId: string): Promise<boolean> {
+  const [course] = await db
+    .select({ createdByUserId: courses.createdByUserId })
+    .from(courses)
+    .where(eq(courses.id, courseId))
+    .limit(1);
+  if (!course) return false; // course not found — caller should 404
+  // Allow access if ownership is not tracked (null = legacy/seeded course)
+  if (course.createdByUserId === null) return true;
+  return course.createdByUserId === userId;
+}
 
 // GET /v1/availability/:courseId/slots — list slots for a course
 availabilityRouter.get('/:courseId/slots', authMiddleware, zValidator('query', listSlotsQuerySchema), async (c) => {
@@ -69,7 +92,18 @@ availabilityRouter.post(
   zValidator('json', createSlotSchema),
   async (c) => {
     const { courseId } = c.req.param();
+    const { supabaseUserId } = c.get('user');
     const { startsAt, capacity, priceInCents } = c.req.valid('json');
+
+    const userId = await resolveUserId(supabaseUserId);
+    if (!userId) {
+      return c.json({ error: { code: 'NOT_FOUND', message: 'User not found' } }, 404);
+    }
+
+    const allowed = await assertCourseOwner(courseId, userId);
+    if (!allowed) {
+      return c.json({ error: { code: 'FORBIDDEN', message: 'You do not own this course' } }, 403);
+    }
 
     const [slot] = await db
       .insert(teeTimeSlots)
@@ -93,6 +127,7 @@ availabilityRouter.patch(
   zValidator('json', updateSlotSchema),
   async (c) => {
     const { slotId } = c.req.param();
+    const { supabaseUserId } = c.get('user');
     const updates = c.req.valid('json');
 
     const [existing] = await db
@@ -103,6 +138,16 @@ availabilityRouter.patch(
 
     if (!existing) {
       return c.json({ error: { code: 'NOT_FOUND', message: 'Slot not found' } }, 404);
+    }
+
+    const userId = await resolveUserId(supabaseUserId);
+    if (!userId) {
+      return c.json({ error: { code: 'NOT_FOUND', message: 'User not found' } }, 404);
+    }
+
+    const allowed = await assertCourseOwner(existing.courseId, userId);
+    if (!allowed) {
+      return c.json({ error: { code: 'FORBIDDEN', message: 'You do not own this course' } }, 403);
     }
 
     const updateData: Partial<typeof teeTimeSlots.$inferInsert> = {
@@ -126,6 +171,7 @@ availabilityRouter.patch(
 // DELETE /v1/availability/slots/:slotId — soft-delete only if bookedCount === 0
 availabilityRouter.delete('/slots/:slotId', authMiddleware, async (c) => {
   const { slotId } = c.req.param();
+  const { supabaseUserId } = c.get('user');
 
   const [slot] = await db
     .select()
@@ -135,6 +181,16 @@ availabilityRouter.delete('/slots/:slotId', authMiddleware, async (c) => {
 
   if (!slot) {
     return c.json({ error: { code: 'NOT_FOUND', message: 'Slot not found' } }, 404);
+  }
+
+  const userId = await resolveUserId(supabaseUserId);
+  if (!userId) {
+    return c.json({ error: { code: 'NOT_FOUND', message: 'User not found' } }, 404);
+  }
+
+  const allowed = await assertCourseOwner(slot.courseId, userId);
+  if (!allowed) {
+    return c.json({ error: { code: 'FORBIDDEN', message: 'You do not own this course' } }, 403);
   }
 
   if (slot.bookedCount > 0) {

@@ -9,7 +9,7 @@ export const scorecardsRouter = new Hono();
 
 const createScorecardSchema = z.object({
   bookingId: z.string().uuid(),
-  holeScores: z.array(z.number().int().min(1)).min(1).max(18),
+  holeScores: z.array(z.number().int().min(1).max(15)).min(1).max(18),
   notes: z.string().max(1000).optional(),
 });
 

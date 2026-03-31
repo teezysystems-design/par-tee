@@ -9,6 +9,7 @@ import {
   timestamp,
   uuid,
 } from 'drizzle-orm/pg-core';
+import { users as teezyUsers } from './users';
 
 // PostGIS geography type (read-only in Drizzle; managed by DB trigger)
 const geography = customType<{ data: string }>({
@@ -33,6 +34,7 @@ export const courses = pgTable('courses', {
   websiteUrl: text('website_url'),
   phoneNumber: text('phone_number'),
   stripeAccountId: text('stripe_account_id'),
+  createdByUserId: uuid('created_by_user_id').references(() => teezyUsers.id, { onDelete: 'set null' }),
   isActive: boolean('is_active').notNull().default(true),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),

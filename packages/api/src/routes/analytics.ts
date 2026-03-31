@@ -1,6 +1,6 @@
 import { Hono } from 'hono';
-import { sql } from 'drizzle-orm';
-import { db, bookings, teeTimeSlots } from '@teezy/db';
+import { sql, eq } from 'drizzle-orm';
+import { db, bookings, teeTimeSlots, courses, users } from '@teezy/db';
 import { authMiddleware } from '../middleware/auth';
 
 export const analyticsRouter = new Hono();
@@ -8,6 +8,33 @@ export const analyticsRouter = new Hono();
 // GET /v1/analytics/:courseId/summary
 analyticsRouter.get('/:courseId/summary', authMiddleware, async (c) => {
   const { courseId } = c.req.param();
+  const { supabaseUserId } = c.get('user');
+
+  // Resolve internal user
+  const [userRow] = await db
+    .select({ id: sql<string>`id` })
+    .from(sql`users`)
+    .where(sql`supabase_user_id = ${supabaseUserId}`)
+    .limit(1);
+
+  if (!userRow) {
+    return c.json({ error: { code: 'NOT_FOUND', message: 'User not found' } }, 404);
+  }
+
+  // Verify requesting user owns this course (createdByUserId may be null for seeded courses)
+  const [course] = await db
+    .select({ id: courses.id, createdByUserId: courses.createdByUserId })
+    .from(courses)
+    .where(eq(courses.id, courseId))
+    .limit(1);
+
+  if (!course) {
+    return c.json({ error: { code: 'NOT_FOUND', message: 'Course not found' } }, 404);
+  }
+
+  if (course.createdByUserId !== null && course.createdByUserId !== userRow.id) {
+    return c.json({ error: { code: 'FORBIDDEN', message: 'You do not own this course' } }, 403);
+  }
 
   const thirtyDaysAgo = new Date();
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
