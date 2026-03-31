@@ -7,6 +7,7 @@ import { HTTPException } from 'hono/http-exception';
 import { healthRouter } from './routes/health';
 import { coursesRouter } from './routes/courses';
 import { usersRouter } from './routes/users';
+import { bookingsRouter } from './routes/bookings';
 
 const app = new Hono();
 
@@ -31,6 +32,7 @@ app.use(
 app.route('/health', healthRouter);
 app.route('/v1/courses', coursesRouter);
 app.route('/v1/users', usersRouter);
+app.route('/v1/bookings', bookingsRouter);
 
 // 404
 app.notFound((c) => {

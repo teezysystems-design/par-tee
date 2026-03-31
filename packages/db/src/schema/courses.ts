@@ -1,5 +1,6 @@
 import {
   boolean,
+  customType,
   decimal,
   integer,
   jsonb,
@@ -9,12 +10,20 @@ import {
   uuid,
 } from 'drizzle-orm/pg-core';
 
+// PostGIS geography type (read-only in Drizzle; managed by DB trigger)
+const geography = customType<{ data: string }>({
+  dataType() {
+    return 'geography(POINT, 4326)';
+  },
+});
+
 export const courses = pgTable('courses', {
   id: uuid('id').primaryKey().defaultRandom(),
   name: text('name').notNull(),
   description: text('description'),
   locationLat: decimal('location_lat', { precision: 9, scale: 6 }).notNull(),
   locationLng: decimal('location_lng', { precision: 9, scale: 6 }).notNull(),
+  location: geography('location'), // auto-populated by DB trigger
   address: text('address').notNull(),
   moodTags: jsonb('mood_tags').$type<string[]>().default([]),
   amenities: jsonb('amenities').$type<string[]>().default([]),

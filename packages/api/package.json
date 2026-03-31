@@ -15,8 +15,10 @@
   },
   "dependencies": {
     "@hono/node-server": "^1.10.0",
+    "@hono/zod-validator": "^0.2.0",
     "@teezy/db": "*",
     "@teezy/shared": "*",
+    "drizzle-orm": "^0.30.0",
     "hono": "^4.2.0",
     "zod": "^3.22.0"
   },
