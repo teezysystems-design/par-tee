@@ -8,6 +8,7 @@ import {
   RefreshControl,
   ActivityIndicator,
 } from 'react-native';
+import { useRouter } from 'expo-router';
 import { useAuth } from '../../src/context/AuthContext';
 
 const API_URL = process.env['EXPO_PUBLIC_API_URL'] ?? 'http://localhost:4000';
@@ -46,7 +47,7 @@ const STATUS_COLORS: Record<Booking['status'], string> = {
   completed: '#888',
 };
 
-function BookingCard({ booking }: { booking: Booking }) {
+function BookingCard({ booking, onParty }: { booking: Booking; onParty: (id: string) => void }) {
   const date = new Date(booking.startsAt);
   const dateStr = date.toLocaleDateString('en-US', {
     weekday: 'short',
@@ -83,10 +84,17 @@ function BookingCard({ booking }: { booking: Booking }) {
         </View>
       </View>
       <View style={styles.cardFooter}>
-        <Text style={styles.totalLabel}>Total paid</Text>
-        <Text style={styles.totalValue}>
-          ${(booking.totalCents / 100).toFixed(2)}
-        </Text>
+        <View>
+          <Text style={styles.totalLabel}>Total paid</Text>
+          <Text style={styles.totalValue}>
+            ${(booking.totalCents / 100).toFixed(2)}
+          </Text>
+        </View>
+        {booking.status === 'confirmed' && (
+          <TouchableOpacity style={styles.partyBtn} onPress={() => onParty(booking.id)}>
+            <Text style={styles.partyBtnText}>⛳ Start Party</Text>
+          </TouchableOpacity>
+        )}
       </View>
     </View>
   );
@@ -94,6 +102,7 @@ function BookingCard({ booking }: { booking: Booking }) {
 
 export default function BookingsScreen() {
   const { session } = useAuth();
+  const router = useRouter();
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -128,6 +137,10 @@ export default function BookingsScreen() {
   const onRefresh = () => {
     setRefreshing(true);
     fetchBookings(true);
+  };
+
+  const onParty = (bookingId: string) => {
+    router.push({ pathname: '/party/create', params: { bookingId } });
   };
 
   if (loading) {
@@ -172,7 +185,7 @@ export default function BookingsScreen() {
         <FlatList
           data={bookings}
           keyExtractor={(item) => item.id}
-          renderItem={({ item }) => <BookingCard booking={item} />}
+          renderItem={({ item }) => <BookingCard booking={item} onParty={onParty} />}
           contentContainerStyle={styles.list}
           refreshControl={
             <RefreshControl
@@ -231,6 +244,13 @@ const styles = StyleSheet.create({
   },
   totalLabel: { fontSize: 13, color: COLORS.gray600 },
   totalValue: { fontSize: 16, fontWeight: '700', color: COLORS.gray900 },
+  partyBtn: {
+    backgroundColor: COLORS.primary,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 10,
+  },
+  partyBtnText: { color: COLORS.white, fontWeight: '600', fontSize: 13 },
   emptyState: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 40 },
   emptyEmoji: { fontSize: 56, marginBottom: 16 },
   emptyTitle: { fontSize: 20, fontWeight: '700', color: COLORS.gray900, marginBottom: 8 },

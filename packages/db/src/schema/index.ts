@@ -4,3 +4,4 @@ export * from './bookings';
 export * from './social';
 export * from './waitlist';
 export * from './scorecards';
+export * from './parties';

@@ -14,6 +14,7 @@ import { availabilityRouter } from './routes/availability';
 import { analyticsRouter } from './routes/analytics';
 import { paymentsRouter } from './routes/payments';
 import { scorecardsRouter } from './routes/scorecards';
+import { partiesRouter } from './routes/parties';
 
 const app = new Hono();
 
@@ -45,6 +46,7 @@ app.route('/v1/availability', availabilityRouter);
 app.route('/v1/analytics', analyticsRouter);
 app.route('/v1/payments', paymentsRouter);
 app.route('/v1/scorecards', scorecardsRouter);
+app.route('/v1/parties', partiesRouter);
 
 // 404
 app.notFound((c) => {
