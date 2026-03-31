@@ -1,0 +1,36 @@
+{
+  "expo": {
+    "name": "Teezy",
+    "slug": "teezy",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "scheme": "teezy",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#1a7f4b"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.teezy.app"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#1a7f4b"
+      },
+      "package": "com.teezy.app"
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static",
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": ["expo-router", "expo-secure-store", "expo-location"],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}
