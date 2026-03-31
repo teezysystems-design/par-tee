@@ -3,18 +3,30 @@
 import { useState } from 'react';
 
 const COLORS = {
-  green: '#1a6b2a',
-  greenLight: '#2d9e44',
-  greenPale: '#e8f5eb',
+  green: '#1a7f4b',
+  greenDark: '#155f38',
+  greenLight: '#2db870',
+  greenPale: '#e8f5ee',
+  greenPale2: '#f0faf4',
   white: '#ffffff',
   gray50: '#f9fafb',
   gray100: '#f3f4f6',
   gray200: '#e5e7eb',
+  gray400: '#9ca3af',
   gray600: '#4b5563',
   gray700: '#374151',
   gray800: '#1f2937',
   gray900: '#111827',
 };
+
+const MOODS = [
+  { key: 'relaxed', emoji: '😌', label: 'Relaxed', desc: 'Leisurely pace, no pressure' },
+  { key: 'competitive', emoji: '🏆', label: 'Competitive', desc: 'Match play, keep score' },
+  { key: 'social', emoji: '👥', label: 'Social', desc: 'Great for groups & friends' },
+  { key: 'scenic', emoji: '🌅', label: 'Scenic', desc: 'Beautiful views, take it in' },
+  { key: 'beginner', emoji: '🌱', label: 'Beginner', desc: 'Learning-friendly courses' },
+  { key: 'fast-paced', emoji: '⚡', label: 'Fast-paced', desc: 'Quick rounds, efficient play' },
+];
 
 const features = [
   {
@@ -61,12 +73,31 @@ const steps = [
   },
 ];
 
+const testimonials = [
+  {
+    quote: "Finally an app that gets it. I don't always want to play seriously — sometimes I just want a relaxed Sunday morning.",
+    name: 'Marcus T.',
+    hcp: 'HCP 14',
+  },
+  {
+    quote: "Booked a competitive round with my buddy in 30 seconds. The mood filter found us a course we'd never tried before.",
+    name: 'Priya K.',
+    hcp: 'HCP 8',
+  },
+  {
+    quote: "Used the beginner mood for my daughter's first round. Perfect pace, friendly staff. Will use every time.",
+    name: 'David R.',
+    hcp: 'HCP 22',
+  },
+];
+
 export default function LandingPage() {
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [activeMood, setActiveMood] = useState('relaxed');
 
   async function handleWaitlistSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -97,6 +128,8 @@ export default function LandingPage() {
     }
   }
 
+  const activeMoodData = MOODS.find((m) => m.key === activeMood) ?? MOODS[0];
+
   return (
     <div style={{ minHeight: '100vh', background: COLORS.white }}>
       {/* Nav */}
@@ -105,8 +138,8 @@ export default function LandingPage() {
           position: 'sticky',
           top: 0,
           zIndex: 50,
-          background: 'rgba(255,255,255,0.95)',
-          backdropFilter: 'blur(8px)',
+          background: 'rgba(255,255,255,0.96)',
+          backdropFilter: 'blur(10px)',
           borderBottom: `1px solid ${COLORS.gray200}`,
           padding: '0 1.5rem',
         }}
@@ -121,16 +154,20 @@ export default function LandingPage() {
             height: 64,
           }}
         >
-          <span style={{ fontWeight: 800, fontSize: '1.4rem', color: COLORS.green }}>Teezy</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <span style={{ fontSize: '1.3rem' }}>⛳</span>
+            <span style={{ fontWeight: 800, fontSize: '1.4rem', color: COLORS.green }}>Teezy</span>
+          </div>
           <a
             href="#waitlist"
             style={{
               background: COLORS.green,
               color: COLORS.white,
-              padding: '0.5rem 1.25rem',
+              padding: '0.5rem 1.4rem',
               borderRadius: 8,
               fontWeight: 600,
               fontSize: '0.9rem',
+              transition: 'background 0.15s',
             }}
           >
             Join Waitlist
@@ -141,72 +178,247 @@ export default function LandingPage() {
       {/* Hero */}
       <section
         style={{
-          background: `linear-gradient(135deg, ${COLORS.green} 0%, ${COLORS.greenLight} 100%)`,
+          background: `linear-gradient(150deg, ${COLORS.greenDark} 0%, ${COLORS.green} 55%, ${COLORS.greenLight} 100%)`,
           color: COLORS.white,
-          padding: '6rem 1.5rem 5rem',
+          padding: '5.5rem 1.5rem 5rem',
           textAlign: 'center',
+          position: 'relative',
+          overflow: 'hidden',
         }}
       >
-        <div style={{ maxWidth: 760, margin: '0 auto' }}>
+        {/* Subtle background pattern */}
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            backgroundImage: 'radial-gradient(circle at 20% 80%, rgba(255,255,255,0.06) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(255,255,255,0.06) 0%, transparent 50%)',
+            pointerEvents: 'none',
+          }}
+        />
+        <div style={{ maxWidth: 760, margin: '0 auto', position: 'relative' }}>
           <div
             style={{
-              display: 'inline-block',
-              background: 'rgba(255,255,255,0.15)',
-              padding: '0.3rem 1rem',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.4rem',
+              background: 'rgba(255,255,255,0.18)',
+              padding: '0.35rem 1rem',
               borderRadius: 100,
-              fontSize: '0.85rem',
+              fontSize: '0.82rem',
               fontWeight: 600,
               marginBottom: '1.5rem',
-              letterSpacing: '0.05em',
+              letterSpacing: '0.03em',
+              backdropFilter: 'blur(4px)',
             }}
           >
-            Coming Soon — Join the Waitlist
+            <span>🚀</span>
+            <span>Early Access — Join the Waitlist</span>
           </div>
           <h1
             style={{
-              fontSize: 'clamp(2.5rem, 6vw, 4rem)',
+              fontSize: 'clamp(2.6rem, 6vw, 4.2rem)',
               fontWeight: 800,
-              lineHeight: 1.15,
+              lineHeight: 1.12,
               marginBottom: '1.25rem',
+              letterSpacing: '-0.02em',
             }}
           >
             Book Golf by Mood
           </h1>
           <p
             style={{
-              fontSize: 'clamp(1rem, 2vw, 1.3rem)',
-              opacity: 0.9,
-              maxWidth: 580,
+              fontSize: 'clamp(1rem, 2vw, 1.25rem)',
+              opacity: 0.88,
+              maxWidth: 560,
               margin: '0 auto 2.5rem',
               lineHeight: 1.7,
             }}
           >
-            Teezy matches your energy with the perfect course. Whether you&apos;re after a peaceful
-            morning round or a fast-paced competitive game — we&apos;ve got your tee time.
+            Teezy matches your energy with the perfect tee time. Whether you&apos;re after a
+            peaceful morning round or a fast-paced competitive game — we&apos;ve got your vibe.
           </p>
-          <a
-            href="#waitlist"
+          <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+            <a
+              href="#waitlist"
+              style={{
+                display: 'inline-block',
+                background: COLORS.white,
+                color: COLORS.green,
+                padding: '0.9rem 2.5rem',
+                borderRadius: 12,
+                fontWeight: 700,
+                fontSize: '1.05rem',
+                boxShadow: '0 4px 24px rgba(0,0,0,0.18)',
+              }}
+            >
+              Join Waitlist — It&apos;s Free
+            </a>
+            <a
+              href="#how-it-works"
+              style={{
+                display: 'inline-block',
+                background: 'rgba(255,255,255,0.15)',
+                color: COLORS.white,
+                padding: '0.9rem 2rem',
+                borderRadius: 12,
+                fontWeight: 600,
+                fontSize: '1.05rem',
+                border: '1px solid rgba(255,255,255,0.3)',
+              }}
+            >
+              See how it works →
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* Mood Picker Preview */}
+      <section style={{ padding: '5rem 1.5rem', background: COLORS.white }}>
+        <div style={{ maxWidth: 960, margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
+            <span
+              style={{
+                display: 'inline-block',
+                background: COLORS.greenPale,
+                color: COLORS.green,
+                padding: '0.25rem 0.85rem',
+                borderRadius: 100,
+                fontSize: '0.82rem',
+                fontWeight: 600,
+                marginBottom: '0.85rem',
+                letterSpacing: '0.04em',
+              }}
+            >
+              MOOD-FIRST DISCOVERY
+            </span>
+            <h2
+              style={{
+                fontSize: 'clamp(1.75rem, 4vw, 2.5rem)',
+                fontWeight: 800,
+                color: COLORS.gray900,
+                letterSpacing: '-0.02em',
+              }}
+            >
+              Pick your mood, find your round
+            </h2>
+            <p style={{ color: COLORS.gray600, marginTop: '0.75rem', fontSize: '1.05rem' }}>
+              Every course tagged with the vibe you&apos;re after — no more guessing.
+            </p>
+          </div>
+
+          {/* Interactive mood selector preview */}
+          <div
             style={{
-              display: 'inline-block',
-              background: COLORS.white,
-              color: COLORS.green,
-              padding: '0.9rem 2.5rem',
-              borderRadius: 12,
-              fontWeight: 700,
-              fontSize: '1.05rem',
-              boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
+              background: COLORS.gray50,
+              borderRadius: 24,
+              padding: '2.5rem',
+              border: `1px solid ${COLORS.gray200}`,
             }}
           >
-            Join Waitlist — It&apos;s Free
-          </a>
+            <p style={{ fontSize: '0.88rem', fontWeight: 600, color: COLORS.gray600, marginBottom: '1rem', letterSpacing: '0.04em' }}>
+              HOW ARE YOU PLAYING TODAY?
+            </p>
+            <div
+              style={{
+                display: 'flex',
+                flexWrap: 'wrap',
+                gap: '0.6rem',
+                marginBottom: '2rem',
+              }}
+            >
+              {MOODS.map((mood) => (
+                <button
+                  key={mood.key}
+                  onClick={() => setActiveMood(mood.key)}
+                  style={{
+                    padding: '0.6rem 1.1rem',
+                    borderRadius: 100,
+                    border: `2px solid ${activeMood === mood.key ? COLORS.green : COLORS.gray200}`,
+                    background: activeMood === mood.key ? COLORS.green : COLORS.white,
+                    color: activeMood === mood.key ? COLORS.white : COLORS.gray700,
+                    fontWeight: 600,
+                    fontSize: '0.9rem',
+                    cursor: 'pointer',
+                    transition: 'all 0.15s',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.35rem',
+                  }}
+                >
+                  <span>{mood.emoji}</span>
+                  <span>{mood.label}</span>
+                </button>
+              ))}
+            </div>
+
+            {/* Active mood preview card */}
+            <div
+              style={{
+                background: COLORS.white,
+                border: `1px solid ${COLORS.gray200}`,
+                borderRadius: 16,
+                padding: '1.5rem',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                flexWrap: 'wrap',
+                gap: '1rem',
+              }}
+            >
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.4rem' }}>
+                  <span style={{ fontSize: '1.75rem' }}>{activeMoodData.emoji}</span>
+                  <span style={{ fontWeight: 700, fontSize: '1.1rem', color: COLORS.gray900 }}>
+                    {activeMoodData.label} mode
+                  </span>
+                </div>
+                <p style={{ color: COLORS.gray600, fontSize: '0.95rem' }}>{activeMoodData.desc}</p>
+              </div>
+              <div
+                style={{
+                  background: COLORS.greenPale,
+                  color: COLORS.green,
+                  fontWeight: 700,
+                  fontSize: '0.9rem',
+                  padding: '0.5rem 1.25rem',
+                  borderRadius: 8,
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                Showing matching courses →
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
       {/* Features */}
-      <section style={{ padding: '5rem 1.5rem', background: COLORS.white }}>
+      <section style={{ padding: '5rem 1.5rem', background: COLORS.greenPale2 }}>
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: '3.5rem' }}>
-            <h2 style={{ fontSize: 'clamp(1.75rem, 4vw, 2.5rem)', fontWeight: 800, color: COLORS.gray900 }}>
+            <span
+              style={{
+                display: 'inline-block',
+                background: COLORS.greenPale,
+                color: COLORS.green,
+                padding: '0.25rem 0.85rem',
+                borderRadius: 100,
+                fontSize: '0.82rem',
+                fontWeight: 600,
+                marginBottom: '0.85rem',
+                letterSpacing: '0.04em',
+              }}
+            >
+              FEATURES
+            </span>
+            <h2
+              style={{
+                fontSize: 'clamp(1.75rem, 4vw, 2.5rem)',
+                fontWeight: 800,
+                color: COLORS.gray900,
+                letterSpacing: '-0.02em',
+              }}
+            >
               Everything you need on the course
             </h2>
             <p style={{ color: COLORS.gray600, marginTop: '0.75rem', fontSize: '1.05rem' }}>
@@ -224,17 +436,41 @@ export default function LandingPage() {
               <div
                 key={f.title}
                 style={{
-                  background: COLORS.gray50,
-                  borderRadius: 16,
+                  background: COLORS.white,
+                  borderRadius: 20,
                   padding: '2rem',
                   border: `1px solid ${COLORS.gray200}`,
+                  transition: 'box-shadow 0.2s',
                 }}
               >
-                <div style={{ fontSize: '2.25rem', marginBottom: '1rem' }}>{f.icon}</div>
-                <h3 style={{ fontWeight: 700, fontSize: '1.1rem', marginBottom: '0.5rem', color: COLORS.gray900 }}>
+                <div
+                  style={{
+                    width: 52,
+                    height: 52,
+                    borderRadius: 14,
+                    background: COLORS.greenPale,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '1.6rem',
+                    marginBottom: '1rem',
+                  }}
+                >
+                  {f.icon}
+                </div>
+                <h3
+                  style={{
+                    fontWeight: 700,
+                    fontSize: '1.05rem',
+                    marginBottom: '0.5rem',
+                    color: COLORS.gray900,
+                  }}
+                >
                   {f.title}
                 </h3>
-                <p style={{ color: COLORS.gray600, fontSize: '0.95rem', lineHeight: 1.65 }}>{f.description}</p>
+                <p style={{ color: COLORS.gray600, fontSize: '0.93rem', lineHeight: 1.65 }}>
+                  {f.description}
+                </p>
               </div>
             ))}
           </div>
@@ -242,14 +478,36 @@ export default function LandingPage() {
       </section>
 
       {/* How It Works */}
-      <section style={{ padding: '5rem 1.5rem', background: COLORS.greenPale }}>
+      <section id="how-it-works" style={{ padding: '5rem 1.5rem', background: COLORS.white }}>
         <div style={{ maxWidth: 900, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: '3.5rem' }}>
-            <h2 style={{ fontSize: 'clamp(1.75rem, 4vw, 2.5rem)', fontWeight: 800, color: COLORS.gray900 }}>
-              How it works
+            <span
+              style={{
+                display: 'inline-block',
+                background: COLORS.greenPale,
+                color: COLORS.green,
+                padding: '0.25rem 0.85rem',
+                borderRadius: 100,
+                fontSize: '0.82rem',
+                fontWeight: 600,
+                marginBottom: '0.85rem',
+                letterSpacing: '0.04em',
+              }}
+            >
+              HOW IT WORKS
+            </span>
+            <h2
+              style={{
+                fontSize: 'clamp(1.75rem, 4vw, 2.5rem)',
+                fontWeight: 800,
+                color: COLORS.gray900,
+                letterSpacing: '-0.02em',
+              }}
+            >
+              From mood to green in three steps
             </h2>
             <p style={{ color: COLORS.gray600, marginTop: '0.75rem', fontSize: '1.05rem' }}>
-              From mood to green in three simple steps.
+              No friction. No guesswork. Just golf.
             </p>
           </div>
           <div
@@ -259,14 +517,14 @@ export default function LandingPage() {
               gap: '2rem',
             }}
           >
-            {steps.map((step) => (
+            {steps.map((step, i) => (
               <div key={step.number} style={{ textAlign: 'center', padding: '1.5rem' }}>
                 <div
                   style={{
-                    width: 56,
-                    height: 56,
+                    width: 60,
+                    height: 60,
                     borderRadius: '50%',
-                    background: COLORS.green,
+                    background: i === 0 ? COLORS.green : i === 1 ? COLORS.greenLight : COLORS.gray800,
                     color: COLORS.white,
                     display: 'flex',
                     alignItems: 'center',
@@ -274,14 +532,98 @@ export default function LandingPage() {
                     fontWeight: 800,
                     fontSize: '1.1rem',
                     margin: '0 auto 1.25rem',
+                    boxShadow: '0 4px 14px rgba(0,0,0,0.12)',
                   }}
                 >
                   {step.number}
                 </div>
-                <h3 style={{ fontWeight: 700, fontSize: '1.1rem', marginBottom: '0.5rem', color: COLORS.gray900 }}>
+                <h3
+                  style={{
+                    fontWeight: 700,
+                    fontSize: '1.1rem',
+                    marginBottom: '0.5rem',
+                    color: COLORS.gray900,
+                  }}
+                >
                   {step.title}
                 </h3>
-                <p style={{ color: COLORS.gray600, fontSize: '0.95rem', lineHeight: 1.65 }}>{step.description}</p>
+                <p style={{ color: COLORS.gray600, fontSize: '0.95rem', lineHeight: 1.65 }}>
+                  {step.description}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Social Proof */}
+      <section style={{ padding: '5rem 1.5rem', background: COLORS.gray50 }}>
+        <div style={{ maxWidth: 1000, margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
+            <h2
+              style={{
+                fontSize: 'clamp(1.6rem, 3.5vw, 2.2rem)',
+                fontWeight: 800,
+                color: COLORS.gray900,
+                letterSpacing: '-0.02em',
+              }}
+            >
+              Golfers love it
+            </h2>
+          </div>
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+              gap: '1.5rem',
+            }}
+          >
+            {testimonials.map((t) => (
+              <div
+                key={t.name}
+                style={{
+                  background: COLORS.white,
+                  borderRadius: 20,
+                  padding: '1.75rem',
+                  border: `1px solid ${COLORS.gray200}`,
+                }}
+              >
+                <div style={{ color: COLORS.green, fontSize: '1.5rem', marginBottom: '0.75rem' }}>
+                  ★★★★★
+                </div>
+                <p
+                  style={{
+                    color: COLORS.gray700,
+                    fontSize: '0.95rem',
+                    lineHeight: 1.7,
+                    marginBottom: '1.25rem',
+                    fontStyle: 'italic',
+                  }}
+                >
+                  &ldquo;{t.quote}&rdquo;
+                </p>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+                  <div
+                    style={{
+                      width: 36,
+                      height: 36,
+                      borderRadius: '50%',
+                      background: COLORS.greenPale,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontWeight: 700,
+                      color: COLORS.green,
+                      fontSize: '0.9rem',
+                    }}
+                  >
+                    {t.name.charAt(0)}
+                  </div>
+                  <div>
+                    <p style={{ fontWeight: 700, fontSize: '0.9rem', color: COLORS.gray900 }}>{t.name}</p>
+                    <p style={{ fontSize: '0.8rem', color: COLORS.gray600 }}>{t.hcp}</p>
+                  </div>
+                </div>
               </div>
             ))}
           </div>
@@ -289,29 +631,53 @@ export default function LandingPage() {
       </section>
 
       {/* Waitlist */}
-      <section id="waitlist" style={{ padding: '5rem 1.5rem', background: COLORS.white }}>
-        <div style={{ maxWidth: 560, margin: '0 auto', textAlign: 'center' }}>
-          <h2 style={{ fontSize: 'clamp(1.75rem, 4vw, 2.25rem)', fontWeight: 800, color: COLORS.gray900 }}>
+      <section
+        id="waitlist"
+        style={{
+          padding: '6rem 1.5rem',
+          background: `linear-gradient(150deg, ${COLORS.greenDark} 0%, ${COLORS.green} 100%)`,
+          color: COLORS.white,
+          textAlign: 'center',
+        }}
+      >
+        <div style={{ maxWidth: 560, margin: '0 auto' }}>
+          <div style={{ fontSize: '2.5rem', marginBottom: '0.75rem' }}>⛳</div>
+          <h2
+            style={{
+              fontSize: 'clamp(1.75rem, 4vw, 2.5rem)',
+              fontWeight: 800,
+              marginBottom: '1rem',
+              letterSpacing: '-0.02em',
+            }}
+          >
             Be first on the tee
           </h2>
-          <p style={{ color: COLORS.gray600, marginTop: '0.75rem', marginBottom: '2.5rem', fontSize: '1.05rem' }}>
-            Join our waitlist and get early access when we launch. No spam, ever.
+          <p
+            style={{
+              opacity: 0.88,
+              marginBottom: '2.5rem',
+              fontSize: '1.05rem',
+              lineHeight: 1.7,
+            }}
+          >
+            Join our waitlist and get early access when we launch. No spam, ever. Just golf.
           </p>
 
           {submitted ? (
             <div
               style={{
-                background: COLORS.greenPale,
-                border: `2px solid ${COLORS.green}`,
-                borderRadius: 16,
-                padding: '2rem',
+                background: 'rgba(255,255,255,0.15)',
+                border: '2px solid rgba(255,255,255,0.4)',
+                borderRadius: 20,
+                padding: '2.5rem',
+                backdropFilter: 'blur(8px)',
               }}
             >
-              <div style={{ fontSize: '2.5rem', marginBottom: '0.75rem' }}>⛳</div>
-              <h3 style={{ fontWeight: 700, color: COLORS.green, fontSize: '1.25rem', marginBottom: '0.5rem' }}>
+              <div style={{ fontSize: '3rem', marginBottom: '0.75rem' }}>🎉</div>
+              <h3 style={{ fontWeight: 700, fontSize: '1.35rem', marginBottom: '0.5rem' }}>
                 You&apos;re on the list!
               </h3>
-              <p style={{ color: COLORS.gray600 }}>We&apos;ll let you know the moment Teezy launches.</p>
+              <p style={{ opacity: 0.88 }}>We&apos;ll reach out the moment Teezy launches.</p>
             </div>
           ) : (
             <form onSubmit={handleWaitlistSubmit}>
@@ -322,12 +688,15 @@ export default function LandingPage() {
                 onChange={(e) => setName(e.target.value)}
                 style={{
                   width: '100%',
-                  padding: '0.85rem 1.25rem',
-                  borderRadius: 10,
-                  border: `1.5px solid ${COLORS.gray200}`,
+                  padding: '0.9rem 1.25rem',
+                  borderRadius: 12,
+                  border: '1.5px solid rgba(255,255,255,0.3)',
                   fontSize: '1rem',
                   marginBottom: '0.75rem',
                   outline: 'none',
+                  background: 'rgba(255,255,255,0.15)',
+                  color: COLORS.white,
+                  backdropFilter: 'blur(4px)',
                 }}
               />
               <input
@@ -338,16 +707,26 @@ export default function LandingPage() {
                 required
                 style={{
                   width: '100%',
-                  padding: '0.85rem 1.25rem',
-                  borderRadius: 10,
-                  border: `1.5px solid ${error ? '#ef4444' : COLORS.gray200}`,
+                  padding: '0.9rem 1.25rem',
+                  borderRadius: 12,
+                  border: `1.5px solid ${error ? '#fca5a5' : 'rgba(255,255,255,0.3)'}`,
                   fontSize: '1rem',
                   marginBottom: '1rem',
                   outline: 'none',
+                  background: 'rgba(255,255,255,0.15)',
+                  color: COLORS.white,
+                  backdropFilter: 'blur(4px)',
                 }}
               />
               {error && (
-                <p style={{ color: '#ef4444', fontSize: '0.9rem', marginBottom: '0.75rem', textAlign: 'left' }}>
+                <p
+                  style={{
+                    color: '#fca5a5',
+                    fontSize: '0.9rem',
+                    marginBottom: '0.75rem',
+                    textAlign: 'left',
+                  }}
+                >
                   {error}
                 </p>
               )}
@@ -356,18 +735,23 @@ export default function LandingPage() {
                 disabled={loading}
                 style={{
                   width: '100%',
-                  background: loading ? COLORS.gray200 : COLORS.green,
-                  color: loading ? COLORS.gray600 : COLORS.white,
-                  padding: '0.9rem',
-                  borderRadius: 10,
+                  background: loading ? 'rgba(255,255,255,0.3)' : COLORS.white,
+                  color: loading ? 'rgba(255,255,255,0.6)' : COLORS.green,
+                  padding: '0.95rem',
+                  borderRadius: 12,
                   fontWeight: 700,
-                  fontSize: '1rem',
+                  fontSize: '1.05rem',
                   cursor: loading ? 'not-allowed' : 'pointer',
                   border: 'none',
+                  boxShadow: loading ? 'none' : '0 4px 16px rgba(0,0,0,0.15)',
+                  transition: 'all 0.15s',
                 }}
               >
-                {loading ? 'Joining...' : 'Join Waitlist'}
+                {loading ? 'Joining...' : 'Join Waitlist — It\'s Free'}
               </button>
+              <p style={{ marginTop: '1rem', opacity: 0.7, fontSize: '0.85rem' }}>
+                No spam. Unsubscribe anytime.
+              </p>
             </form>
           )}
         </div>
@@ -378,16 +762,20 @@ export default function LandingPage() {
         style={{
           background: COLORS.gray900,
           color: COLORS.gray600,
-          padding: '2rem 1.5rem',
+          padding: '2.5rem 1.5rem',
           textAlign: 'center',
-          fontSize: '0.9rem',
         }}
       >
-        <p style={{ color: COLORS.white, fontWeight: 700, fontSize: '1.2rem', marginBottom: '0.5rem' }}>Teezy</p>
-        <p>Book Golf by Mood — Coming Soon</p>
-        <p style={{ marginTop: '0.5rem' }}>
-          &copy; {new Date().getFullYear()} Teezy. All rights reserved.
-        </p>
+        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
+            <span style={{ fontSize: '1.1rem' }}>⛳</span>
+            <p style={{ color: COLORS.white, fontWeight: 800, fontSize: '1.2rem' }}>Teezy</p>
+          </div>
+          <p style={{ fontSize: '0.9rem', marginBottom: '0.4rem' }}>Book Golf by Mood — Coming Soon</p>
+          <p style={{ fontSize: '0.82rem', marginTop: '0.5rem' }}>
+            &copy; {new Date().getFullYear()} Teezy. All rights reserved.
+          </p>
+        </div>
       </footer>
     </div>
   );
