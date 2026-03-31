@@ -1,3 +1,12 @@
+/**
+ * Profile Screen — Instagram-style layout
+ *
+ * Layout:
+ *   1. Header   — avatar, name, edit button
+ *   2. Stats bar — rounds played, handicap, rank badge, avg score
+ *   3. Badges row — earned rank/achievement badges
+ *   4. Posts grid — shared round cards (score + course + date)
+ */
 import { useCallback, useEffect, useState } from 'react';
 import {
   View,
@@ -9,19 +18,24 @@ import {
   ActivityIndicator,
   ScrollView,
   RefreshControl,
+  FlatList,
 } from 'react-native';
 import { useAuth } from '../../src/context/AuthContext';
+import { RANK_TIERS } from '@teezy/shared/types';
+import { RANK_COLORS } from '@teezy/shared/colors';
+import type { RankTier } from '@teezy/shared/types';
 
 const API_URL = process.env['EXPO_PUBLIC_API_URL'] ?? 'http://localhost:4000';
+const PRIMARY = '#1a7f4b';
 
 const MOODS = [
-  { key: 'relaxed', label: '😌 Relaxed' },
+  { key: 'relaxed',     label: '😌 Relaxed' },
   { key: 'competitive', label: '🏆 Competitive' },
-  { key: 'social', label: '👥 Social' },
-  { key: 'scenic', label: '🌅 Scenic' },
-  { key: 'beginner', label: '🌱 Beginner-friendly' },
-  { key: 'advanced', label: '🔥 Advanced' },
-  { key: 'fast-paced', label: '⚡ Fast-paced' },
+  { key: 'social',      label: '👥 Social' },
+  { key: 'scenic',      label: '🌅 Scenic' },
+  { key: 'beginner',    label: '🌱 Beginner-friendly' },
+  { key: 'advanced',    label: '🔥 Advanced' },
+  { key: 'fast-paced',  label: '⚡ Fast-paced' },
   { key: 'challenging', label: '💪 Challenging' },
 ] as const;
 
@@ -36,17 +50,174 @@ interface UserProfile {
   avatarUrl: string | null;
 }
 
+// Mocked competitive stats & shared rounds (until API endpoints exist)
+const MOCK_RANK: RankTier = 'scratch';
+const MOCK_RANK_POINTS = 1240;
+const MOCK_ROUNDS_PLAYED = 42;
+const MOCK_AVG_SCORE = 78.4;
+const MOCK_WINS = 9;
+
+const MOCK_EARNED_BADGES: { tier: RankTier; earnedAt: string }[] = [
+  { tier: 'rookie',      earnedAt: 'Jan 2026' },
+  { tier: 'amateur',     earnedAt: 'Feb 2026' },
+  { tier: 'club_player', earnedAt: 'Mar 2026' },
+  { tier: 'scratch',     earnedAt: 'Mar 2026' },
+];
+
+const MOCK_POSTS = [
+  { id: 'p1', courseName: 'Pebble Creek GC', totalScore: 76, scoreToPar: +4, date: 'Mar 28', holes: 18 },
+  { id: 'p2', courseName: 'Lakeside Links',  totalScore: 73, scoreToPar: +1, date: 'Mar 22', holes: 18 },
+  { id: 'p3', courseName: 'Highland GC',     totalScore: 81, scoreToPar: +9, date: 'Mar 15', holes: 18 },
+  { id: 'p4', courseName: 'Pebble Creek GC', totalScore: 75, scoreToPar: +3, date: 'Mar 8',  holes: 18 },
+  { id: 'p5', courseName: 'Fairway Hills',   totalScore: 78, scoreToPar: +6, date: 'Mar 1',  holes: 18 },
+  { id: 'p6', courseName: 'Lakeside Links',  totalScore: 72, scoreToPar: 0,  date: 'Feb 22', holes: 18 },
+];
+
+// ─── Badge component ────────────────────────────────────────────────────────
+
+function BadgePill({ tier, earnedAt }: { tier: RankTier; earnedAt: string }) {
+  const info = RANK_TIERS.find((r) => r.tier === tier);
+  const colors = RANK_COLORS[tier];
+  return (
+    <View style={[b.badge, { backgroundColor: colors.bg, borderColor: colors.border }]}>
+      <Text style={{ fontSize: 20 }}>{info?.icon}</Text>
+      <Text style={[b.badgeLabel, { color: colors.text }]}>{info?.label}</Text>
+      <Text style={b.badgeDate}>{earnedAt}</Text>
+    </View>
+  );
+}
+
+// ─── Round post cell ────────────────────────────────────────────────────────
+
+function PostCell({ post }: { post: typeof MOCK_POSTS[0] }) {
+  const diff = post.scoreToPar;
+  const diffStr = diff === 0 ? 'E' : diff > 0 ? `+${diff}` : `${diff}`;
+  const diffColor = diff < 0 ? PRIMARY : diff === 0 ? '#374151' : '#dc2626';
+
+  return (
+    <View style={p.cell}>
+      <Text style={[p.cellScore, { color: diffColor }]}>{diffStr}</Text>
+      <Text style={p.cellTotal}>{post.totalScore}</Text>
+      <Text style={p.cellCourse} numberOfLines={2}>{post.courseName}</Text>
+      <Text style={p.cellDate}>{post.date}</Text>
+    </View>
+  );
+}
+
+// ─── Edit profile form ──────────────────────────────────────────────────────
+
+function EditProfileForm({
+  profile,
+  onSave,
+  onCancel,
+}: {
+  profile: UserProfile;
+  onSave: (profile: UserProfile) => void;
+  onCancel: () => void;
+}) {
+  const { session } = useAuth();
+  const [editName, setEditName] = useState(profile.name);
+  const [editHandicap, setEditHandicap] = useState(profile.handicap ?? '');
+  const [editMoods, setEditMoods] = useState<MoodKey[]>(
+    (profile.moodPreferences ?? []) as MoodKey[]
+  );
+  const [saving, setSaving] = useState(false);
+
+  const toggleMood = (mood: MoodKey) => {
+    setEditMoods((prev) =>
+      prev.includes(mood) ? prev.filter((m) => m !== mood) : [...prev, mood]
+    );
+  };
+
+  const save = async () => {
+    if (!session || !editName.trim()) {
+      Alert.alert('Name required', 'Please enter your name.');
+      return;
+    }
+    const handicap = editHandicap.trim() ? parseFloat(editHandicap.trim()) : null;
+    if (handicap !== null && (isNaN(handicap) || handicap < 0 || handicap > 54)) {
+      Alert.alert('Invalid handicap', 'Handicap must be between 0 and 54.');
+      return;
+    }
+    setSaving(true);
+    try {
+      const res = await fetch(`${API_URL}/v1/users/me`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` },
+        body: JSON.stringify({ name: editName.trim(), handicap, moodPreferences: editMoods }),
+      });
+      if (!res.ok) {
+        const body = await res.json();
+        throw new Error(body?.error?.message ?? 'Failed to save');
+      }
+      const json = await res.json();
+      onSave(json.data);
+    } catch (err: unknown) {
+      Alert.alert('Error', err instanceof Error ? err.message : 'Could not save profile');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <ScrollView contentContainerStyle={e.container}>
+      <Text style={e.title}>Edit Profile</Text>
+
+      <Text style={e.label}>Name</Text>
+      <TextInput
+        style={e.input}
+        value={editName}
+        onChangeText={setEditName}
+        placeholder="Your name"
+        placeholderTextColor="#9ca3af"
+        autoCapitalize="words"
+      />
+
+      <Text style={e.label}>Handicap (optional)</Text>
+      <TextInput
+        style={e.input}
+        value={editHandicap}
+        onChangeText={setEditHandicap}
+        placeholder="e.g. 18.4"
+        placeholderTextColor="#9ca3af"
+        keyboardType="decimal-pad"
+      />
+
+      <Text style={e.label}>Golf moods</Text>
+      <View style={e.moodsGrid}>
+        {MOODS.map((mood) => {
+          const selected = editMoods.includes(mood.key);
+          return (
+            <TouchableOpacity
+              key={mood.key}
+              style={[e.moodChip, selected && e.moodChipSelected]}
+              onPress={() => toggleMood(mood.key)}
+            >
+              <Text style={[e.moodChipText, selected && e.moodChipTextSelected]}>
+                {mood.label}
+              </Text>
+            </TouchableOpacity>
+          );
+        })}
+      </View>
+
+      <TouchableOpacity style={e.primaryBtn} onPress={save} disabled={saving}>
+        {saving ? <ActivityIndicator color="#fff" /> : <Text style={e.primaryBtnText}>Save changes</Text>}
+      </TouchableOpacity>
+      <TouchableOpacity style={e.textBtn} onPress={onCancel}>
+        <Text style={e.textBtnText}>Cancel</Text>
+      </TouchableOpacity>
+    </ScrollView>
+  );
+}
+
+// ─── Main Screen ───────────────────────────────────────────────────────────
+
 export default function ProfileScreen() {
   const { session, signOut } = useAuth();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [fetching, setFetching] = useState(true);
   const [editing, setEditing] = useState(false);
-  const [saving, setSaving] = useState(false);
-
-  // Edit state
-  const [editName, setEditName] = useState('');
-  const [editHandicap, setEditHandicap] = useState('');
-  const [editMoods, setEditMoods] = useState<MoodKey[]>([]);
 
   const fetchProfile = useCallback(async () => {
     if (!session) return;
@@ -60,76 +231,16 @@ export default function ProfileScreen() {
         setProfile(json.data);
       }
     } catch {
-      // silent — profile will remain null
+      // silent
     } finally {
       setFetching(false);
     }
   }, [session]);
 
-  useEffect(() => {
-    fetchProfile();
-  }, [fetchProfile]);
-
-  const startEditing = () => {
-    if (!profile) return;
-    setEditName(profile.name);
-    setEditHandicap(profile.handicap ?? '');
-    setEditMoods((profile.moodPreferences ?? []) as MoodKey[]);
-    setEditing(true);
-  };
-
-  const cancelEditing = () => setEditing(false);
-
-  const toggleMood = (mood: MoodKey) => {
-    setEditMoods((prev) =>
-      prev.includes(mood) ? prev.filter((m) => m !== mood) : [...prev, mood]
-    );
-  };
-
-  const saveProfile = async () => {
-    if (!session || !editName.trim()) {
-      Alert.alert('Name required', 'Please enter your name.');
-      return;
-    }
-
-    const handicap = editHandicap.trim() ? parseFloat(editHandicap.trim()) : null;
-    if (handicap !== null && (isNaN(handicap) || handicap < 0 || handicap > 54)) {
-      Alert.alert('Invalid handicap', 'Handicap must be between 0 and 54.');
-      return;
-    }
-
-    setSaving(true);
-    try {
-      const res = await fetch(`${API_URL}/v1/users/me`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${session.access_token}`,
-        },
-        body: JSON.stringify({
-          name: editName.trim(),
-          handicap,
-          moodPreferences: editMoods,
-        }),
-      });
-
-      if (!res.ok) {
-        const body = await res.json();
-        throw new Error(body?.error?.message ?? 'Failed to save');
-      }
-
-      const json = await res.json();
-      setProfile(json.data);
-      setEditing(false);
-    } catch (err: unknown) {
-      Alert.alert('Error', err instanceof Error ? err.message : 'Could not save profile');
-    } finally {
-      setSaving(false);
-    }
-  };
+  useEffect(() => { fetchProfile(); }, [fetchProfile]);
 
   const handleSignOut = () => {
-    Alert.alert('Sign out', 'Are you sure you want to sign out?', [
+    Alert.alert('Sign out', 'Are you sure?', [
       { text: 'Cancel', style: 'cancel' },
       { text: 'Sign out', style: 'destructive', onPress: signOut },
     ]);
@@ -137,18 +248,18 @@ export default function ProfileScreen() {
 
   if (fetching) {
     return (
-      <View style={styles.centered}>
-        <ActivityIndicator size="large" color="#1a7f4b" />
+      <View style={pr.centered}>
+        <ActivityIndicator size="large" color={PRIMARY} />
       </View>
     );
   }
 
   if (!profile) {
     return (
-      <View style={styles.centered}>
-        <Text style={styles.errorText}>Could not load profile.</Text>
-        <TouchableOpacity style={styles.retryBtn} onPress={fetchProfile}>
-          <Text style={styles.retryBtnText}>Retry</Text>
+      <View style={pr.centered}>
+        <Text style={pr.errorText}>Could not load profile.</Text>
+        <TouchableOpacity style={pr.retryBtn} onPress={fetchProfile}>
+          <Text style={pr.retryBtnText}>Retry</Text>
         </TouchableOpacity>
       </View>
     );
@@ -156,98 +267,117 @@ export default function ProfileScreen() {
 
   if (editing) {
     return (
-      <ScrollView contentContainerStyle={styles.container}>
-        <Text style={styles.sectionTitle}>Edit Profile</Text>
-
-        <Text style={styles.label}>Name</Text>
-        <TextInput
-          style={styles.input}
-          value={editName}
-          onChangeText={setEditName}
-          placeholder="Your name"
-          placeholderTextColor="#999"
-          autoCapitalize="words"
-        />
-
-        <Text style={styles.label}>Handicap (optional)</Text>
-        <TextInput
-          style={styles.input}
-          value={editHandicap}
-          onChangeText={setEditHandicap}
-          placeholder="e.g. 18.4"
-          placeholderTextColor="#999"
-          keyboardType="decimal-pad"
-        />
-
-        <Text style={styles.label}>Golf moods</Text>
-        <View style={styles.moodsGrid}>
-          {MOODS.map((mood) => {
-            const selected = editMoods.includes(mood.key);
-            return (
-              <TouchableOpacity
-                key={mood.key}
-                style={[styles.moodChip, selected && styles.moodChipSelected]}
-                onPress={() => toggleMood(mood.key)}
-              >
-                <Text style={[styles.moodChipText, selected && styles.moodChipTextSelected]}>
-                  {mood.label}
-                </Text>
-              </TouchableOpacity>
-            );
-          })}
-        </View>
-
-        <TouchableOpacity style={styles.primaryBtn} onPress={saveProfile} disabled={saving}>
-          {saving ? (
-            <ActivityIndicator color="#fff" />
-          ) : (
-            <Text style={styles.primaryBtnText}>Save changes</Text>
-          )}
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.textBtn} onPress={cancelEditing}>
-          <Text style={styles.textBtnText}>Cancel</Text>
-        </TouchableOpacity>
-      </ScrollView>
+      <EditProfileForm
+        profile={profile}
+        onSave={(updated) => { setProfile(updated); setEditing(false); }}
+        onCancel={() => setEditing(false)}
+      />
     );
   }
 
+  const rankInfo = RANK_TIERS.find((r) => r.tier === MOCK_RANK);
+  const rankColors = RANK_COLORS[MOCK_RANK];
+
   return (
     <ScrollView
-      contentContainerStyle={styles.container}
-      refreshControl={<RefreshControl refreshing={fetching} onRefresh={fetchProfile} tintColor="#1a7f4b" />}
+      style={pr.screen}
+      contentContainerStyle={pr.content}
+      refreshControl={<RefreshControl refreshing={fetching} onRefresh={fetchProfile} tintColor={PRIMARY} />}
     >
-      <View style={styles.avatarPlaceholder}>
-        <Text style={styles.avatarInitial}>{profile.name.charAt(0).toUpperCase()}</Text>
+      {/* ── Header ─────────────────────────────────────────────── */}
+      <View style={pr.header}>
+        {/* Avatar */}
+        <View style={pr.avatarWrap}>
+          <View style={pr.avatar}>
+            <Text style={pr.avatarInitial}>{profile.name.charAt(0).toUpperCase()}</Text>
+          </View>
+          {/* Rank ring */}
+          <View style={[pr.rankRing, { borderColor: rankColors.border, backgroundColor: rankColors.bg }]}>
+            <Text style={{ fontSize: 10 }}>{rankInfo?.icon}</Text>
+          </View>
+        </View>
+
+        <View style={pr.headerInfo}>
+          <Text style={pr.profileName}>{profile.name}</Text>
+          <Text style={pr.profileEmail}>{profile.email}</Text>
+          {profile.handicap != null && (
+            <Text style={pr.handicapText}>HCP {Number(profile.handicap).toFixed(1)}</Text>
+          )}
+        </View>
+
+        <TouchableOpacity style={pr.editBtn} onPress={() => setEditing(true)}>
+          <Text style={pr.editBtnText}>Edit</Text>
+        </TouchableOpacity>
       </View>
 
-      <Text style={styles.profileName}>{profile.name}</Text>
-      <Text style={styles.profileEmail}>{profile.email}</Text>
-
-      <View style={styles.statRow}>
-        <View style={styles.statBox}>
-          <Text style={styles.statValue}>
-            {profile.handicap != null ? Number(profile.handicap).toFixed(1) : '—'}
+      {/* ── Stats bar ─────────────────────────────────────────── */}
+      <View style={pr.statsBar}>
+        <View style={pr.statItem}>
+          <Text style={pr.statValue}>{MOCK_ROUNDS_PLAYED}</Text>
+          <Text style={pr.statLabel}>Rounds</Text>
+        </View>
+        <View style={pr.statDivider} />
+        <View style={pr.statItem}>
+          <Text style={pr.statValue}>{MOCK_AVG_SCORE.toFixed(1)}</Text>
+          <Text style={pr.statLabel}>Avg Score</Text>
+        </View>
+        <View style={pr.statDivider} />
+        <View style={pr.statItem}>
+          <Text style={pr.statValue}>{MOCK_WINS}</Text>
+          <Text style={pr.statLabel}>Wins</Text>
+        </View>
+        <View style={pr.statDivider} />
+        <View style={pr.statItem}>
+          <Text style={[pr.statValue, { color: rankColors.text }]}>
+            {MOCK_RANK_POINTS.toLocaleString()}
           </Text>
-          <Text style={styles.statLabel}>Handicap</Text>
-        </View>
-        <View style={styles.statDivider} />
-        <View style={styles.statBox}>
-          <Text style={styles.statValue}>{profile.moodPreferences?.length ?? 0}</Text>
-          <Text style={styles.statLabel}>Moods set</Text>
+          <Text style={pr.statLabel}>Rank Pts</Text>
         </View>
       </View>
 
+      {/* ── Rank badge ──────────────────────────────────────────── */}
+      <View style={[pr.currentRankCard, { backgroundColor: rankColors.bg, borderColor: rankColors.border }]}>
+        <Text style={{ fontSize: 32 }}>{rankInfo?.icon}</Text>
+        <View style={{ marginLeft: 14 }}>
+          <Text style={[pr.rankLabel, { color: rankColors.text }]}>Current Rank</Text>
+          <Text style={[pr.rankTierName, { color: rankColors.text }]}>{rankInfo?.label}</Text>
+          <Text style={pr.rankPts}>{MOCK_RANK_POINTS.toLocaleString()} pts</Text>
+        </View>
+      </View>
+
+      {/* ── Badges row ─────────────────────────────────────────── */}
+      <View style={pr.sectionHeader}>
+        <Text style={pr.sectionTitle}>Badges Earned</Text>
+        <Text style={pr.sectionSub}>{MOCK_EARNED_BADGES.length} of {RANK_TIERS.length}</Text>
+      </View>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={pr.badgesRow}
+      >
+        {MOCK_EARNED_BADGES.map(({ tier, earnedAt }) => (
+          <BadgePill key={tier} tier={tier} earnedAt={earnedAt} />
+        ))}
+        {/* Locked badges */}
+        {RANK_TIERS.filter((r) => !MOCK_EARNED_BADGES.find((e) => e.tier === r.tier)).map((r) => (
+          <View key={r.tier} style={[b.badge, b.badgeLocked]}>
+            <Text style={{ fontSize: 20, opacity: 0.3 }}>{r.icon}</Text>
+            <Text style={b.badgeLabelLocked}>{r.label}</Text>
+            <Text style={b.badgeDateLocked}>Locked</Text>
+          </View>
+        ))}
+      </ScrollView>
+
+      {/* ── Moods ────────────────────────────────────────────────── */}
       {(profile.moodPreferences?.length ?? 0) > 0 && (
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Your golf moods</Text>
-          <View style={styles.moodsGrid}>
+        <View style={pr.moodsSection}>
+          <Text style={pr.sectionTitle}>Golf Moods</Text>
+          <View style={pr.moodsGrid}>
             {(profile.moodPreferences as MoodKey[]).map((key) => {
               const mood = MOODS.find((m) => m.key === key);
               return (
-                <View key={key} style={[styles.moodChip, styles.moodChipSelected]}>
-                  <Text style={[styles.moodChipText, styles.moodChipTextSelected]}>
-                    {mood?.label ?? key}
-                  </Text>
+                <View key={key} style={pr.moodChip}>
+                  <Text style={pr.moodChipText}>{mood?.label ?? key}</Text>
                 </View>
               );
             })}
@@ -255,110 +385,219 @@ export default function ProfileScreen() {
         </View>
       )}
 
-      <TouchableOpacity style={styles.primaryBtn} onPress={startEditing}>
-        <Text style={styles.primaryBtnText}>Edit profile</Text>
-      </TouchableOpacity>
+      {/* ── Posts grid ─────────────────────────────────────────── */}
+      <View style={pr.sectionHeader}>
+        <Text style={pr.sectionTitle}>Rounds</Text>
+        <Text style={pr.sectionSub}>{MOCK_POSTS.length} shared</Text>
+      </View>
+      <View style={pr.postsGrid}>
+        {MOCK_POSTS.map((post) => (
+          <PostCell key={post.id} post={post} />
+        ))}
+      </View>
 
-      <TouchableOpacity style={styles.signOutBtn} onPress={handleSignOut}>
-        <Text style={styles.signOutBtnText}>Sign out</Text>
+      {/* ── Sign out ─────────────────────────────────────────────── */}
+      <TouchableOpacity style={pr.signOutBtn} onPress={handleSignOut}>
+        <Text style={pr.signOutBtnText}>Sign out</Text>
       </TouchableOpacity>
     </ScrollView>
   );
 }
 
-const styles = StyleSheet.create({
+// ─── Styles ─────────────────────────────────────────────────────────────────
+
+const pr = StyleSheet.create({
+  screen: { flex: 1, backgroundColor: '#fff' },
+  content: { paddingBottom: 48 },
   centered: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24 },
-  container: { flexGrow: 1, alignItems: 'center', padding: 24, backgroundColor: '#fff' },
-  avatarPlaceholder: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: '#1a7f4b',
+  errorText: { color: '#9ca3af', fontSize: 15, marginBottom: 16 },
+  retryBtn: { paddingHorizontal: 24, paddingVertical: 10, backgroundColor: PRIMARY, borderRadius: 8 },
+  retryBtnText: { color: '#fff', fontWeight: '600' },
+
+  // Header
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingTop: 56,
+    paddingBottom: 16,
+    gap: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f3f4f6',
+  },
+  avatarWrap: { position: 'relative' },
+  avatar: {
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+    backgroundColor: PRIMARY,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 12,
-    marginTop: 16,
   },
-  avatarInitial: { fontSize: 32, color: '#fff', fontWeight: '700' },
-  profileName: { fontSize: 22, fontWeight: '700', color: '#111', marginBottom: 4 },
-  profileEmail: { fontSize: 14, color: '#888', marginBottom: 24 },
-  statRow: {
+  avatarInitial: { fontSize: 28, color: '#fff', fontWeight: '800' },
+  rankRing: {
+    position: 'absolute',
+    bottom: -2,
+    right: -2,
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    borderWidth: 2,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  headerInfo: { flex: 1 },
+  profileName: { fontSize: 20, fontWeight: '800', color: '#111' },
+  profileEmail: { fontSize: 13, color: '#9ca3af', marginTop: 1 },
+  handicapText: { fontSize: 13, color: PRIMARY, fontWeight: '700', marginTop: 4 },
+  editBtn: {
+    paddingHorizontal: 16,
+    paddingVertical: 7,
+    borderRadius: 20,
+    borderWidth: 1.5,
+    borderColor: '#e5e7eb',
+  },
+  editBtnText: { fontSize: 13, fontWeight: '700', color: '#374151' },
+
+  // Stats bar
+  statsBar: {
     flexDirection: 'row',
-    backgroundColor: '#f7f7f7',
-    borderRadius: 16,
-    width: '100%',
-    marginBottom: 24,
     paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f3f4f6',
   },
-  statBox: { flex: 1, alignItems: 'center' },
-  statDivider: { width: 1, backgroundColor: '#e0e0e0' },
-  statValue: { fontSize: 22, fontWeight: '700', color: '#1a7f4b' },
-  statLabel: { fontSize: 12, color: '#888', marginTop: 2 },
-  section: { width: '100%', marginBottom: 24 },
-  sectionTitle: {
-    fontSize: 17,
-    fontWeight: '700',
-    color: '#111',
-    marginBottom: 12,
-    alignSelf: 'flex-start',
+  statItem: { flex: 1, alignItems: 'center' },
+  statDivider: { width: 1, backgroundColor: '#f3f4f6' },
+  statValue: { fontSize: 20, fontWeight: '800', color: '#111' },
+  statLabel: { fontSize: 11, color: '#9ca3af', marginTop: 2 },
+
+  // Current rank
+  currentRankCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginHorizontal: 16,
+    marginTop: 16,
+    padding: 16,
+    borderRadius: 16,
+    borderWidth: 1.5,
   },
-  moodsGrid: {
+  rankLabel: { fontSize: 10, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.8 },
+  rankTierName: { fontSize: 20, fontWeight: '900', marginTop: 2 },
+  rankPts: { fontSize: 12, color: '#9ca3af', marginTop: 2 },
+
+  // Section headers
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'baseline',
+    marginHorizontal: 16,
+    marginTop: 24,
+    marginBottom: 10,
+  },
+  sectionTitle: { fontSize: 16, fontWeight: '800', color: '#111' },
+  sectionSub: { fontSize: 13, color: '#9ca3af' },
+
+  // Badges
+  badgesRow: { paddingLeft: 16, paddingRight: 8, paddingBottom: 4, gap: 8 },
+
+  // Moods
+  moodsSection: { paddingHorizontal: 16, marginTop: 20 },
+  moodsGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 8 },
+  moodChip: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+    backgroundColor: PRIMARY,
+  },
+  moodChipText: { fontSize: 13, color: '#fff', fontWeight: '600' },
+
+  // Posts grid
+  postsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
+    paddingHorizontal: 16,
     gap: 8,
-    width: '100%',
-    marginBottom: 16,
   },
+
+  // Sign out
+  signOutBtn: {
+    marginHorizontal: 16,
+    marginTop: 28,
+    paddingVertical: 14,
+    borderRadius: 14,
+    alignItems: 'center',
+    borderWidth: 1.5,
+    borderColor: '#fca5a5',
+  },
+  signOutBtnText: { color: '#ef4444', fontSize: 15, fontWeight: '700' },
+});
+
+const b = StyleSheet.create({
+  badge: {
+    alignItems: 'center',
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    borderRadius: 16,
+    borderWidth: 1.5,
+    minWidth: 80,
+  },
+  badgeLabel: { fontSize: 11, fontWeight: '800', marginTop: 4 },
+  badgeDate: { fontSize: 10, color: '#9ca3af', marginTop: 2 },
+  badgeLocked: { backgroundColor: '#f9fafb', borderColor: '#e5e7eb' },
+  badgeLabelLocked: { fontSize: 11, fontWeight: '600', color: '#d1d5db', marginTop: 4 },
+  badgeDateLocked: { fontSize: 10, color: '#d1d5db', marginTop: 2 },
+});
+
+const p = StyleSheet.create({
+  cell: {
+    width: '31%',
+    aspectRatio: 1,
+    backgroundColor: '#f9fafb',
+    borderRadius: 14,
+    padding: 10,
+    justifyContent: 'space-between',
+  },
+  cellScore: { fontSize: 20, fontWeight: '900' },
+  cellTotal: { fontSize: 28, fontWeight: '900', color: '#111', lineHeight: 30 },
+  cellCourse: { fontSize: 10, color: '#9ca3af', fontWeight: '600' },
+  cellDate: { fontSize: 10, color: '#d1d5db', fontWeight: '600' },
+});
+
+const e = StyleSheet.create({
+  container: { flexGrow: 1, padding: 24, backgroundColor: '#fff', paddingBottom: 48 },
+  title: { fontSize: 22, fontWeight: '800', color: '#111', marginBottom: 24, marginTop: 56 },
+  label: { fontSize: 13, fontWeight: '700', color: '#374151', marginBottom: 6 },
+  input: {
+    borderWidth: 1.5,
+    borderColor: '#e5e7eb',
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    fontSize: 16,
+    color: '#111',
+    marginBottom: 16,
+    backgroundColor: '#f9fafb',
+  },
+  moodsGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 24 },
   moodChip: {
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: 24,
-    borderWidth: 1,
-    borderColor: '#ddd',
+    borderWidth: 1.5,
+    borderColor: '#e5e7eb',
     backgroundColor: '#f9f9f9',
   },
-  moodChipSelected: { backgroundColor: '#1a7f4b', borderColor: '#1a7f4b' },
+  moodChipSelected: { backgroundColor: PRIMARY, borderColor: PRIMARY },
   moodChipText: { fontSize: 13, color: '#444' },
   moodChipTextSelected: { color: '#fff', fontWeight: '600' },
-  label: { fontSize: 14, fontWeight: '600', color: '#444', alignSelf: 'flex-start', marginBottom: 6 },
-  input: {
-    width: '100%',
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 13,
-    fontSize: 16,
-    marginBottom: 16,
-    color: '#111',
-  },
   primaryBtn: {
-    width: '100%',
-    backgroundColor: '#1a7f4b',
+    backgroundColor: PRIMARY,
     paddingVertical: 14,
-    borderRadius: 12,
+    borderRadius: 14,
     alignItems: 'center',
     marginBottom: 12,
   },
-  primaryBtnText: { color: '#fff', fontSize: 16, fontWeight: '600' },
-  textBtn: { paddingVertical: 8 },
-  textBtnText: { color: '#1a7f4b', fontSize: 15 },
-  signOutBtn: {
-    width: '100%',
-    paddingVertical: 14,
-    borderRadius: 12,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#ff4444',
-    marginTop: 8,
-  },
-  signOutBtnText: { color: '#ff4444', fontSize: 16, fontWeight: '600' },
-  errorText: { color: '#888', fontSize: 15, marginBottom: 16 },
-  retryBtn: {
-    paddingHorizontal: 24,
-    paddingVertical: 10,
-    backgroundColor: '#1a7f4b',
-    borderRadius: 8,
-  },
-  retryBtnText: { color: '#fff', fontWeight: '600' },
+  primaryBtnText: { color: '#fff', fontSize: 16, fontWeight: '700' },
+  textBtn: { alignItems: 'center', paddingVertical: 8 },
+  textBtnText: { color: PRIMARY, fontSize: 15 },
 });

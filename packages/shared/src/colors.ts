@@ -57,3 +57,17 @@ export const MOODS = [
 ] as const;
 
 export type MoodKey = (typeof MOODS)[number]['key'];
+
+/** Rank tier visual tokens — bg, text, border colors per tier */
+export const RANK_COLORS = {
+  rookie:      { bg: '#f3f4f6', text: '#6b7280', border: '#d1d5db', glow: 'transparent' },
+  amateur:     { bg: '#fef9c3', text: '#854d0e', border: '#fde047', glow: '#fef08a' },
+  club_player: { bg: '#dbeafe', text: '#1e3a8a', border: '#93c5fd', glow: '#bfdbfe' },
+  scratch:     { bg: '#dcfce7', text: '#14532d', border: '#86efac', glow: '#bbf7d0' },
+  pro:         { bg: '#ede9fe', text: '#4c1d95', border: '#c4b5fd', glow: '#ddd6fe' },
+  elite:       { bg: '#fce7f3', text: '#831843', border: '#f9a8d4', glow: '#fbcfe8' },
+  champion:    { bg: '#fff7ed', text: '#7c2d12', border: '#fb923c', glow: '#fed7aa' },
+  unreal:      { bg: '#0f0f1a', text: '#e9d5ff', border: '#7c3aed', glow: '#7c3aed' },
+} as const;
+
+export type RankTierKey = keyof typeof RANK_COLORS;

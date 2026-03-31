@@ -57,6 +57,14 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
+        name="compete"
+        options={{
+          title: 'Compete',
+          headerShown: false,
+          tabBarIcon: ({ focused }) => <TabIcon emoji="🏆" focused={focused} />,
+        }}
+      />
+      <Tabs.Screen
         name="social"
         options={{
           title: 'Social',
