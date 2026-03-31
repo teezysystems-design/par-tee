@@ -7,25 +7,59 @@ import { authMiddleware } from '../middleware/auth';
 
 export const usersRouter = new Hono();
 
+const moodEnum = z.enum([
+  'competitive',
+  'relaxed',
+  'beginner',
+  'advanced',
+  'fast-paced',
+  'social',
+  'scenic',
+  'challenging',
+]);
+
+const createProfileSchema = z.object({
+  name: z.string().min(1).max(100),
+  handicap: z.number().min(0).max(54).nullable().optional(),
+  moodPreferences: z.array(moodEnum).optional(),
+});
+
 const updateProfileSchema = z.object({
   name: z.string().min(1).max(100).optional(),
   handicap: z.number().min(0).max(54).nullable().optional(),
-  moodPreferences: z
-    .array(
-      z.enum([
-        'competitive',
-        'relaxed',
-        'beginner',
-        'advanced',
-        'fast-paced',
-        'social',
-        'scenic',
-        'challenging',
-      ])
-    )
-    .optional(),
+  moodPreferences: z.array(moodEnum).optional(),
   locationLat: z.number().min(-90).max(90).nullable().optional(),
   locationLng: z.number().min(-180).max(180).nullable().optional(),
+});
+
+// POST /v1/users — create profile on first sign-in (called from onboarding)
+usersRouter.post('/', authMiddleware, zValidator('json', createProfileSchema), async (c) => {
+  const { supabaseUserId, email } = c.get('user');
+  const body = c.req.valid('json');
+
+  // Upsert: if profile already exists, return it; otherwise create
+  const existing = await db
+    .select()
+    .from(users)
+    .where(eq(users.supabaseUserId, supabaseUserId))
+    .limit(1);
+
+  if (existing.length > 0) {
+    return c.json({ data: existing[0] }, 200);
+  }
+
+  const [created] = await db
+    .insert(users)
+    .values({
+      email,
+      supabaseUserId,
+      name: body.name,
+      handicap: body.handicap != null ? String(body.handicap) : null,
+      moodPreferences: body.moodPreferences ?? [],
+    })
+    .returning();
+
+  return c.json({ data: created }, 201);
 });
 
 // GET /v1/users/me

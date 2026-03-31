@@ -27,7 +27,10 @@
     "react-native-gesture-handler": "~2.16.1",
     "expo-secure-store": "~13.0.0",
     "expo-location": "~17.0.0",
-    "expo-image": "~1.12.9"
+    "expo-image": "~1.12.9",
+    "expo-auth-session": "~5.5.0",
+    "expo-web-browser": "~13.0.0",
+    "expo-crypto": "~13.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.24.0",
