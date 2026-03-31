@@ -1,6 +1,7 @@
 import type { Context, MiddlewareHandler, Next } from 'hono';
 import { createMiddleware } from 'hono/factory';
 import { HTTPException } from 'hono/http-exception';
+import { createClient } from '@supabase/supabase-js';
 
 export interface AuthUser {
   supabaseUserId: string;
@@ -13,6 +14,17 @@ declare module 'hono' {
   }
 }
 
+function getSupabaseAdmin() {
+  const supabaseUrl = process.env['SUPABASE_URL'];
+  const supabaseServiceKey = process.env['SUPABASE_SERVICE_ROLE_KEY'];
+  if (!supabaseUrl || !supabaseServiceKey) {
+    throw new Error('Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY');
+  }
+  return createClient(supabaseUrl, supabaseServiceKey, {
+    auth: { autoRefreshToken: false, persistSession: false },
+  });
+}
+
 export const authMiddleware: MiddlewareHandler = createMiddleware(
   async (c: Context, next: Next) => {
     const authHeader = c.req.header('Authorization');
@@ -22,20 +34,19 @@ export const authMiddleware: MiddlewareHandler = createMiddleware(
 
     const token = authHeader.slice(7);
 
-    // TODO: Validate JWT with Supabase once env is configured
-    // For now, decode and trust (replace with real Supabase JWT verification)
     try {
-      const [, payloadB64] = token.split('.');
-      if (!payloadB64) throw new Error('Invalid token format');
-      const payload = JSON.parse(Buffer.from(payloadB64, 'base64').toString('utf8')) as {
-        sub?: string;
-        email?: string;
-      };
-      if (!payload.sub || !payload.email) {
-        throw new Error('Missing sub or email in token');
+      const admin = getSupabaseAdmin();
+      const { data, error } = await admin.auth.getUser(token);
+      if (error || !data.user) {
+        throw new HTTPException(401, { message: 'Invalid or expired token' });
       }
-      c.set('user', { supabaseUserId: payload.sub, email: payload.email });
-    } catch {
+      const { id, email } = data.user;
+      if (!email) {
+        throw new HTTPException(401, { message: 'Token missing email claim' });
+      }
+      c.set('user', { supabaseUserId: id, email });
+    } catch (err) {
+      if (err instanceof HTTPException) throw err;
       throw new HTTPException(401, { message: 'Invalid token' });
     }
 
