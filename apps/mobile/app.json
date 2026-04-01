@@ -7,13 +7,7 @@
     "icon": "./assets/icon.png",
     "scheme": "par-tee",
     "description": "Book golf tee times based on your mood. Find courses that match how you want to play.",
-    "keywords": [
-      "golf",
-      "tee time",
-      "booking",
-      "mood"
-    ],
-    "privacy": "https://par-tee.app/privacy",
+    "privacy": "unlisted",
     "userInterfaceStyle": "automatic",
     "splash": {
       "image": "./assets/splash.png",
