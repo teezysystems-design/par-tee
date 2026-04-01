@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "main": "./dist/index.js",
+  "react-native": "./src/index.ts",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "exports": {
