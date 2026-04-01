@@ -1,6 +1,7 @@
 {
-  "buildCommand": "npx turbo run build --filter=@teezy/web",
+  "buildCommand": "npm install && npx turbo run build --filter=@teezy/web",
   "outputDirectory": "apps/web/.next",
-  "installCommand": "npm install",
-  "framework": "nextjs"
+  "installCommand": "echo 'install handled in build'",
+  "devCommand": "npx turbo run dev --filter=@teezy/web",
+  "framework": null
 }
