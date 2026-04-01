@@ -20,7 +20,7 @@ import {
 } from 'react-native';
 import { router } from 'expo-router';
 import { useAuth } from '../src/context/AuthContext';
-import type { Tournament, TournamentLeaderboardEntry } from '@teezy/shared/types';
+import type { Tournament, TournamentLeaderboardEntry } from '@teezy/shared';
 
 const API_URL = process.env['EXPO_PUBLIC_API_URL'] ?? 'http://localhost:4000';
 const PRIMARY = '#1a7f4b';
