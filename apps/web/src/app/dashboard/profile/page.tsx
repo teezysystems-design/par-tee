@@ -42,7 +42,7 @@ interface CourseProfile {
 
 export default function CourseProfilePage() {
   const courseId = process.env['NEXT_PUBLIC_COURSE_ID'];
-  const [profile, setProfile] = useState<CourseProfile | null>(null);
+  const [, setProfile] = useState<CourseProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);

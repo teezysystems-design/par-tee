@@ -27,14 +27,6 @@ interface TeeTimeSlot {
   priceInCents: number;
 }
 
-interface Booking {
-  id: string;
-  status: string;
-  partySize: number;
-  totalPriceInCents: number;
-  slotId: string;
-  createdAt: string;
-}
 
 export default function ProShopPage() {
   const courseId = process.env['NEXT_PUBLIC_COURSE_ID'];
