@@ -2,7 +2,7 @@
 
 ## What Is a Mini Tournament?
 
-A mini tournament is a short competitive window you set up at your course. During the window, golfers who book a round can opt in and compete on a live leaderboard. It's free for golfers, drives more bookings for you, and gets promoted in the Teezy discovery feed automatically.
+A mini tournament is a short competitive window you set up at your course. During the window, golfers who book a round can opt in and compete on a live leaderboard. It's free for golfers, drives more bookings for you, and gets promoted in the PAR-Tee discovery feed automatically.
 
 ---
 
@@ -23,7 +23,7 @@ A mini tournament is a short competitive window you set up at your course. Durin
 
 5. Click **Publish**. The tournament is now live and will appear in:
    - Your course's discovery card
-   - The Teezy events feed
+   - The PAR-Tee events feed
    - The player's tournament opt-in flow when they book a round at your course
 
 ---
@@ -52,7 +52,7 @@ From the **Tournaments** section in your Manager Dashboard, you can:
 When the tournament window closes:
 
 1. The leaderboard is finalized.
-2. The winner and results are automatically posted to the Teezy social feed.
+2. The winner and results are automatically posted to the PAR-Tee social feed.
 3. Tournament results appear on each participating player's profile.
 4. You can announce the winner and award any prizes directly.
 
@@ -76,7 +76,7 @@ No. Only one active tournament per course at a time to keep the leaderboard clea
 No — mini tournaments are open to any player who books a round during the window.
 
 **What scoring format is used?**
-Stroke play (lowest total score wins). Scores are adjusted for course difficulty, consistent with Teezy's ranking system.
+Stroke play (lowest total score wins). Scores are adjusted for course difficulty, consistent with PAR-Tee's ranking system.
 
 **Do tournament results affect players' main rank?**
 No. Mini tournament results are completely separate from the main ranking system.

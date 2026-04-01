@@ -2,7 +2,7 @@
 
 ## What Are Events & Promotions?
 
-Events and promotions let you advertise what's happening at your course directly in the Teezy discovery feed and social feed. When you post an event, golfers nearby see it — even if they've never visited your course before. It's free marketing built into the platform.
+Events and promotions let you advertise what's happening at your course directly in the PAR-Tee discovery feed and social feed. When you post an event, golfers nearby see it — even if they've never visited your course before. It's free marketing built into the platform.
 
 Examples: Ladies Night, Couples Night, Happy Hour, Twilight Specials, Club Championship, New Member Drive, Food & Drink Specials.
 
@@ -24,7 +24,7 @@ Examples: Ladies Night, Couples Night, Happy Hour, Twilight Specials, Club Champ
 
 5. Click **Publish**. Your event will appear:
    - On your course's profile card in the discovery feed
-   - In the Teezy social/events feed for nearby players
+   - In the PAR-Tee social/events feed for nearby players
    - On the profiles of players who follow your course
 
 ---
@@ -45,7 +45,7 @@ From the **Events & Promotions** section you can:
 - **Add an image.** Events with photos get significantly more views. Use a bright, on-brand photo.
 - **Write a clear description.** Include the basics: what, when, who, and any special pricing or prizes.
 - **Post early.** Give golfers at least a week's notice so they can plan a booking around your event.
-- **Promote regularly.** A course that posts consistent events builds a following on Teezy, driving repeat bookings.
+- **Promote regularly.** A course that posts consistent events builds a following on PAR-Tee, driving repeat bookings.
 
 ---
 

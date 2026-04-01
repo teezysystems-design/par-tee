@@ -2,7 +2,7 @@
 
 ## Two Dashboards, Two Roles
 
-Teezy provides two separate dashboards for course staff — one for day-to-day tee sheet management, and one for owners and managers who need a broader view. Each has its own login credentials.
+PAR-Tee provides two separate dashboards for course staff — one for day-to-day tee sheet management, and one for owners and managers who need a broader view. Each has its own login credentials.
 
 ---
 

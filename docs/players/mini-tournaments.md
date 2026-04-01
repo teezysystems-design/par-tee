@@ -29,7 +29,7 @@ They're a great way to add a layer of competition to your regular rounds — wit
 
 ## How Scoring Works
 
-Mini tournaments use **stroke play** format — lowest score wins. Scores are adjusted for course difficulty, consistent with the rest of the Teezy scoring system.
+Mini tournaments use **stroke play** format — lowest score wins. Scores are adjusted for course difficulty, consistent with the rest of the PAR-Tee scoring system.
 
 ---
 

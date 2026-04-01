@@ -1,6 +1,6 @@
-# Teezy Support Documentation
+# PAR-Tee Support Documentation
 
-Welcome to the Teezy support documentation. Use the links below to find what you need.
+Welcome to the PAR-Tee support documentation. Use the links below to find what you need.
 
 ---
 

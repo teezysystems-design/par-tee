@@ -1,17 +1,17 @@
-# Teezy FAQ
+# PAR-Tee FAQ
 
 ---
 
 ## General
 
-**What is Teezy?**
-Teezy is a social golf booking app. Find courses based on your vibe, book tee times, compete with friends, climb a ranking system, join leagues, and share your game on a social feed.
+**What is PAR-Tee?**
+PAR-Tee is a social golf booking app. Find courses based on your vibe, book tee times, compete with friends, climb a ranking system, join leagues, and share your game on a social feed.
 
-**Is Teezy free?**
-Yes — Teezy is 100% free for golfers. There are no subscriptions, no fees, and no in-app purchases. Courses pay a small per-booking fee, which keeps the platform free for players.
+**Is PAR-Tee free?**
+Yes — PAR-Tee is 100% free for golfers. There are no subscriptions, no fees, and no in-app purchases. Courses pay a small per-booking fee, which keeps the platform free for players.
 
-**Is Teezy available on iOS and Android?**
-Yes. Teezy is available on both iOS and Android as well as on the web at teezy.app.
+**Is PAR-Tee available on iOS and Android?**
+Yes. PAR-Tee is available on both iOS and Android as well as on the web at par-tee.app.
 
 **Do I need an account to browse courses?**
 You can browse courses on the discovery map without an account, but you'll need to sign up to book a tee time, join leagues, or access the social features.
@@ -24,7 +24,7 @@ You can browse courses on the discovery map without an account, but you'll need 
 Tap **Sign Up** on the home screen and register with your email address or a social login (Apple, Google).
 
 **What is the difference between a public and private account?**
-- **Public:** Anyone on Teezy can see your profile, stats, and posts.
+- **Public:** Anyone on PAR-Tee can see your profile, stats, and posts.
 - **Private:** Only approved friends can see your stats, posts, and availability. Your username and profile photo are still visible to others.
 
 **How do I switch between public and private?**
@@ -154,4 +154,4 @@ See the [Event Creation Guide](./courses/event-creation-guide.md).
 
 ## Still Need Help?
 
-If your question isn't answered here, reach out to Teezy support at **support@teezy.app**.
+If your question isn't answered here, reach out to PAR-Tee support at **support@par-tee.app**.

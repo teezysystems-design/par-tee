@@ -2,7 +2,7 @@
 
 ## How Ranking Works
 
-Teezy's ranking system is designed to feel like a real competitive game — think ranked mode in Fortnite or League of Legends, but for golf. Every Fun or Competitive round you play moves your rank up or down based on your scores, your consistency, and how often you play.
+PAR-Tee's ranking system is designed to feel like a real competitive game — think ranked mode in Fortnite or League of Legends, but for golf. Every Fun or Competitive round you play moves your rank up or down based on your scores, your consistency, and how often you play.
 
 ### What Counts Toward Your Rank
 
@@ -66,7 +66,7 @@ Your traditional golf handicap is calculated alongside your rank and displayed o
 Playing regularly keeps your rank from becoming inactive, and more rounds give you more opportunities to improve. However, consistently bad scores in Competitive mode can lower your rank.
 
 **How is course difficulty factored in?**
-Teezy adjusts scores based on each course's difficulty rating. A great score on a tough course is worth more than the same score on an easy one.
+PAR-Tee adjusts scores based on each course's difficulty rating. A great score on a tough course is worth more than the same score on an easy one.
 
 **Can my rank go down?**
 Yes. In Competitive rounds especially, poor performance can lower your rank. Fun rounds are weighted more leniently.

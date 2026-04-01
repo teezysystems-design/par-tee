@@ -41,7 +41,7 @@ When you're viewing availability and find a day that works for your crew:
 **Do I have to set my availability every week?**
 No. It's optional. If you don't set it, your friends simply won't see availability for you that week — they'll need to reach out directly.
 
-**Can my availability be seen by anyone on Teezy?**
+**Can my availability be seen by anyone on PAR-Tee?**
 Only your friends can see your availability (or anyone if your profile is public). If your account is set to private, only approved friends see it.
 
 **Can I mark myself available for specific times of day, not just days?**
