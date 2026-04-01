@@ -189,8 +189,8 @@ function ConnectContent() {
           >
             <p style={{ fontWeight: 600, marginBottom: '0.4rem' }}>How it works</p>
             <ul style={{ paddingLeft: '1.25rem', lineHeight: 1.7 }}>
-              <li>Golfers pay through Teezy at booking time</li>
-              <li>Teezy collects a $1.25 platform fee per booking</li>
+              <li>Golfers pay through PAR-Tee at booking time</li>
+              <li>PAR-Tee collects a $1.25 platform fee per booking</li>
               <li>Your earnings are transferred to your connected Stripe account</li>
             </ul>
           </div>

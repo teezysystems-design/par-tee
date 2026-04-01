@@ -1,6 +1,6 @@
 import { Hono } from 'hono';
 import { sql, eq } from 'drizzle-orm';
-import { db, bookings, teeTimeSlots, courses, users } from '@teezy/db';
+import { db, bookings, teeTimeSlots, courses, users } from '@par-tee/db';
 import { authMiddleware } from '../middleware/auth';
 
 export const analyticsRouter = new Hono();

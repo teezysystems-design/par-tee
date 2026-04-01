@@ -10,8 +10,8 @@ export default defineConfig({
     conditions: ['node', 'import', 'module', 'default'],
     alias: {
       // Resolve workspace packages from source during tests (no build required)
-      '@teezy/db': path.resolve(__dirname, '../db/src/index.ts'),
-      '@teezy/shared': path.resolve(__dirname, '../shared/src/index.ts'),
+      '@par-tee/db': path.resolve(__dirname, '../db/src/index.ts'),
+      '@par-tee/shared': path.resolve(__dirname, '../shared/src/index.ts'),
     },
   },
 });

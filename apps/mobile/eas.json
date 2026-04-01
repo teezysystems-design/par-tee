@@ -27,7 +27,7 @@
   "submit": {
     "production": {
       "ios": {
-        "appleId": "team@teezy.app",
+        "appleId": "team@par-tee.app",
         "ascAppId": "PLACEHOLDER_APP_STORE_CONNECT_ID",
         "appleTeamId": "PLACEHOLDER_TEAM_ID"
       },

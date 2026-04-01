@@ -25,7 +25,7 @@ export default function LoginScreen() {
   const [otp, setOtp] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const redirectUri = makeRedirectUri({ scheme: 'teezy' });
+  const redirectUri = makeRedirectUri({ scheme: 'par-tee' });
 
   const handleGoogleSignIn = async () => {
     setLoading(true);
@@ -178,7 +178,7 @@ export default function LoginScreen() {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.logo}>⛳</Text>
-      <Text style={styles.title}>Welcome to Teezy</Text>
+      <Text style={styles.title}>Welcome to PAR-Tee</Text>
       <Text style={styles.subtitle}>Discover tee times that match your mood</Text>
 
       <TouchableOpacity style={[styles.oauthBtn, styles.googleBtn]} onPress={handleGoogleSignIn} disabled={loading}>

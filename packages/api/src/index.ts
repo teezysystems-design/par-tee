@@ -69,7 +69,7 @@ app.onError((err, c) => {
 });
 
 const port = Number(process.env['PORT'] ?? 4000);
-console.log(`Teezy API running on http://localhost:${port}`);
+console.log(`PAR-Tee API running on http://localhost:${port}`);
 
 serve({ fetch: app.fetch, port });
 

@@ -1,8 +1,8 @@
 /**
- * Teezy Design Tokens — shared color palette used across web and mobile.
+ * PAR-Tee Design Tokens — shared color palette used across web and mobile.
  *
- * Web usage:  import { COLORS } from '@teezy/shared/colors'
- * Mobile:     import { COLORS } from '@teezy/shared/colors'
+ * Web usage:  import { COLORS } from '@par-tee/shared/colors'
+ * Mobile:     import { COLORS } from '@par-tee/shared/colors'
  *
  * NOTE: Mobile StyleSheet values must be plain strings (no CSS variables).
  * Use these tokens directly in both React and React Native style objects.

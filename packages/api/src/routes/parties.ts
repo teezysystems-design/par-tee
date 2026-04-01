@@ -9,7 +9,7 @@ import {
   partyMembers,
   holeScores,
   users,
-} from '@teezy/db';
+} from '@par-tee/db';
 import { authMiddleware } from '../middleware/auth';
 
 export const partiesRouter = new Hono();

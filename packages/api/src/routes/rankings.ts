@@ -2,9 +2,9 @@ import { Hono } from 'hono';
 import { zValidator } from '@hono/zod-validator';
 import { z } from 'zod';
 import { and, asc, desc, eq, sql } from 'drizzle-orm';
-import { db, playerRankings, users } from '@teezy/db';
+import { db, playerRankings, users } from '@par-tee/db';
 import { authMiddleware } from '../middleware/auth';
-import { RANK_TIERS } from '@teezy/shared/types';
+import { RANK_TIERS } from '@par-tee/shared';
 
 export const rankingsRouter = new Hono();
 

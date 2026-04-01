@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "Teezy",
-    "slug": "teezy",
+    "name": "PAR-Tee",
+    "slug": "par-tee",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "scheme": "teezy",
+    "scheme": "par-tee",
     "description": "Book golf tee times based on your mood. Find courses that match how you want to play.",
     "keywords": [
       "golf",
@@ -13,7 +13,7 @@
       "booking",
       "mood"
     ],
-    "privacy": "https://teezy.app/privacy",
+    "privacy": "https://par-tee.app/privacy",
     "userInterfaceStyle": "automatic",
     "splash": {
       "image": "./assets/splash.png",
@@ -22,11 +22,11 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.teezy.app",
+      "bundleIdentifier": "com.partee.app",
       "buildNumber": "1"
     },
     "android": {
-      "package": "com.teezy.app",
+      "package": "com.partee.app",
       "versionCode": 1,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",

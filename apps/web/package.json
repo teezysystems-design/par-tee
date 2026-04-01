@@ -1,5 +1,5 @@
 {
-  "name": "@teezy/web",
+  "name": "@par-tee/web",
   "version": "0.0.1",
   "private": true,
   "scripts": {
@@ -12,7 +12,7 @@
     "test:e2e": "playwright test"
   },
   "dependencies": {
-    "@teezy/shared": "*",
+    "@par-tee/shared": "*",
     "@supabase/supabase-js": "^2.41.0",
     "@stripe/stripe-js": "^3.0.0",
     "clsx": "^2.1.0",

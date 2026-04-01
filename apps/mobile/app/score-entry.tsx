@@ -19,7 +19,7 @@ import {
 } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useAuth } from '../src/context/AuthContext';
-import type { HoleScore } from '@teezy/shared';
+import type { HoleScore } from '@par-tee/shared';
 
 const API_URL = process.env['EXPO_PUBLIC_API_URL'] ?? 'http://localhost:4000';
 const PRIMARY = '#1a7f4b';

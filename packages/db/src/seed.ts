@@ -1,6 +1,6 @@
 /**
  * Seed script: 25 sample golf courses across the US with mood tags and geo coordinates.
- * Run with: pnpm --filter @teezy/db db:seed
+ * Run with: pnpm --filter @par-tee/db db:seed
  */
 
 import { db, courses, teeTimeSlots } from './index';

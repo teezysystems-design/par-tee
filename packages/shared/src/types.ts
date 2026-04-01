@@ -36,7 +36,7 @@ export type PricingTier = 'standard' | 'basic_promotion' | 'active_promotion' | 
 
 export const PRICING_TIERS: { tier: PricingTier; label: string; feeCents: number; description: string }[] = [
   { tier: 'standard',         label: 'Standard',           feeCents: 275, description: 'Base rate per completed booking' },
-  { tier: 'basic_promotion',  label: 'Basic Promotion',    feeCents: 225, description: 'Teezy listed on your website/booking page' },
+  { tier: 'basic_promotion',  label: 'Basic Promotion',    feeCents: 225, description: 'PAR-Tee listed on your website/booking page' },
   { tier: 'active_promotion', label: 'Active Promotion',   feeCents: 200, description: 'Signage on course + staff mentions to players' },
   { tier: 'tournament',       label: 'Tournament Partner', feeCents: 175, description: 'Run mini tournament + social media promotion' },
   { tier: 'founding',         label: 'Founding Course',    feeCents: 150, description: 'Founding partner rate — locked forever' },

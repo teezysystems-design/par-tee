@@ -14,7 +14,7 @@ import {
   feedPosts,
   postLikes,
   postComments,
-} from '@teezy/db';
+} from '@par-tee/db';
 import { authMiddleware } from '../middleware/auth';
 
 export const socialRouter = new Hono();

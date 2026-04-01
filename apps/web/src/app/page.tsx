@@ -156,7 +156,7 @@ export default function LandingPage() {
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             <span style={{ fontSize: '1.3rem' }}>⛳</span>
-            <span style={{ fontWeight: 800, fontSize: '1.4rem', color: COLORS.green }}>Teezy</span>
+            <span style={{ fontWeight: 800, fontSize: '1.4rem', color: COLORS.green }}>PAR-Tee</span>
           </div>
           <a
             href="#waitlist"
@@ -234,7 +234,7 @@ export default function LandingPage() {
               lineHeight: 1.7,
             }}
           >
-            Teezy matches your energy with the perfect tee time. Whether you&apos;re after a
+            PAR-Tee matches your energy with the perfect tee time. Whether you&apos;re after a
             peaceful morning round or a fast-paced competitive game — we&apos;ve got your vibe.
           </p>
           <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', flexWrap: 'wrap' }}>
@@ -677,7 +677,7 @@ export default function LandingPage() {
               <h3 style={{ fontWeight: 700, fontSize: '1.35rem', marginBottom: '0.5rem' }}>
                 You&apos;re on the list!
               </h3>
-              <p style={{ opacity: 0.88 }}>We&apos;ll reach out the moment Teezy launches.</p>
+              <p style={{ opacity: 0.88 }}>We&apos;ll reach out the moment PAR-Tee launches.</p>
             </div>
           ) : (
             <form onSubmit={handleWaitlistSubmit}>
@@ -769,11 +769,11 @@ export default function LandingPage() {
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
             <span style={{ fontSize: '1.1rem' }}>⛳</span>
-            <p style={{ color: COLORS.white, fontWeight: 800, fontSize: '1.2rem' }}>Teezy</p>
+            <p style={{ color: COLORS.white, fontWeight: 800, fontSize: '1.2rem' }}>PAR-Tee</p>
           </div>
           <p style={{ fontSize: '0.9rem', marginBottom: '0.4rem' }}>Book Golf by Mood — Coming Soon</p>
           <p style={{ fontSize: '0.82rem', marginTop: '0.5rem' }}>
-            &copy; {new Date().getFullYear()} Teezy. All rights reserved.
+            &copy; {new Date().getFullYear()} PAR-Tee. All rights reserved.
           </p>
         </div>
       </footer>

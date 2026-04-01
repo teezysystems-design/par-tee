@@ -10,7 +10,7 @@ import {
   timestamp,
   uuid,
 } from 'drizzle-orm/pg-core';
-import { users as teezyUsers } from './users';
+import { users as parTeeUsers } from './users';
 
 // ─── Pricing tiers ───────────────────────────────────────────────────────────
 export const pricingTierEnum = pgEnum('pricing_tier', [
@@ -48,7 +48,7 @@ export const courses = pgTable('courses', {
   phoneNumber: text('phone_number'),
   stripeAccountId: text('stripe_account_id'),
   pricingTier: pricingTierEnum('pricing_tier').notNull().default('standard'),
-  createdByUserId: uuid('created_by_user_id').references(() => teezyUsers.id, { onDelete: 'set null' }),
+  createdByUserId: uuid('created_by_user_id').references(() => parTeeUsers.id, { onDelete: 'set null' }),
   isActive: boolean('is_active').notNull().default(true),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
@@ -62,7 +62,7 @@ export const courseStaff = pgTable('course_staff', {
     .references(() => courses.id, { onDelete: 'cascade' }),
   userId: uuid('user_id')
     .notNull()
-    .references(() => teezyUsers.id, { onDelete: 'cascade' }),
+    .references(() => parTeeUsers.id, { onDelete: 'cascade' }),
   role: staffRoleEnum('role').notNull().default('pro_shop'),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
 });

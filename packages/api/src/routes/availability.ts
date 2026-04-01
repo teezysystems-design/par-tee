@@ -2,7 +2,7 @@ import { Hono } from 'hono';
 import { zValidator } from '@hono/zod-validator';
 import { z } from 'zod';
 import { eq, and, sql, gte, lt } from 'drizzle-orm';
-import { db, teeTimeSlots, courses } from '@teezy/db';
+import { db, teeTimeSlots, courses } from '@par-tee/db';
 import { authMiddleware } from '../middleware/auth';
 
 export const availabilityRouter = new Hono();

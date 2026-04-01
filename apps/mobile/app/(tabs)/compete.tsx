@@ -10,8 +10,8 @@ import {
 } from 'react-native';
 import { router } from 'expo-router';
 import { useAuth } from '../../src/context/AuthContext';
-import type { LeaderboardEntry, LeaderboardType, RankTier } from '@teezy/shared';
-import { RANK_TIERS, RANK_COLORS } from '@teezy/shared';
+import type { LeaderboardEntry, LeaderboardType, RankTier } from '@par-tee/shared';
+import { RANK_TIERS, RANK_COLORS } from '@par-tee/shared';
 
 const API_URL = process.env['EXPO_PUBLIC_API_URL'] ?? 'http://localhost:4000';
 const PRIMARY = '#1a7f4b';

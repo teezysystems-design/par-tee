@@ -6,7 +6,7 @@ export default function AuthLayout() {
       <Stack.Screen name="login" options={{ headerShown: false }} />
       <Stack.Screen
         name="onboarding"
-        options={{ title: 'Welcome to Teezy', headerBackVisible: false }}
+        options={{ title: 'Welcome to PAR-Tee', headerBackVisible: false }}
       />
     </Stack>
   );

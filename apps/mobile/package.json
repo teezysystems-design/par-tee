@@ -1,5 +1,5 @@
 {
-  "name": "@teezy/mobile",
+  "name": "@par-tee/mobile",
   "version": "1.0.0",
   "private": true,
   "main": "expo-router/entry",
@@ -16,7 +16,7 @@
   "dependencies": {
     "@react-navigation/native": "^6.1.0",
     "@supabase/supabase-js": "^2.41.0",
-    "@teezy/shared": "*",
+    "@par-tee/shared": "*",
     "expo": "~51.0.0",
     "expo-auth-session": "~5.5.0",
     "expo-constants": "^16.0.2",

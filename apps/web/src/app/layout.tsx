@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: { template: '%s | Teezy', default: 'Teezy — Book Golf by Mood' },
+  title: { template: '%s | PAR-Tee', default: 'PAR-Tee — Book Golf by Mood' },
   description: 'Discover and book golf tee times based on how you feel.',
 };
 

@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
 import { zValidator } from '@hono/zod-validator';
 import { z } from 'zod';
-import { db, waitlist } from '@teezy/db';
+import { db, waitlist } from '@par-tee/db';
 import { count } from 'drizzle-orm';
 
 export const waitlistRouter = new Hono();

@@ -2,7 +2,7 @@ import { Hono } from 'hono';
 import { zValidator } from '@hono/zod-validator';
 import { z } from 'zod';
 import { eq } from 'drizzle-orm';
-import { db, bookings, courses } from '@teezy/db';
+import { db, bookings, courses } from '@par-tee/db';
 import { authMiddleware } from '../middleware/auth';
 import Stripe from 'stripe';
 

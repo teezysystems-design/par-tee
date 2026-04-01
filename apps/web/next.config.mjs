@@ -3,7 +3,7 @@ const nextConfig = {
   reactStrictMode: true,
   eslint: { ignoreDuringBuilds: true },
   typescript: { ignoreBuildErrors: false },
-  transpilePackages: ['@teezy/shared'],
+  transpilePackages: ['@par-tee/shared'],
   images: {
     remotePatterns: [
       {

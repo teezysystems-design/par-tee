@@ -1,5 +1,5 @@
 /**
- * Unit tests for Teezy API routes.
+ * Unit tests for PAR-Tee API routes.
  *
  * Each test creates a minimal Hono app that mounts only the router under test,
  * so we never import index.ts (which calls serve() and loads @hono/node-server).
@@ -10,9 +10,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // ---------------------------------------------------------------------------
-// Mock @teezy/db before any route import
+// Mock @par-tee/db before any route import
 // ---------------------------------------------------------------------------
-vi.mock('@teezy/db', () => ({
+vi.mock('@par-tee/db', () => ({
   db: {
     select: vi.fn(),
     insert: vi.fn(),
@@ -51,7 +51,7 @@ import { bookingsRouter } from '../routes/bookings';
 import { scorecardsRouter } from '../routes/scorecards';
 import { availabilityRouter } from '../routes/availability';
 import { healthRouter } from '../routes/health';
-import { db } from '@teezy/db';
+import { db } from '@par-tee/db';
 
 // ---------------------------------------------------------------------------
 // Helper: build a test app mounting a single router

@@ -60,7 +60,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <span style={{ fontSize: '1.1rem' }}>⛳</span>
             <div>
               <span style={{ fontWeight: 800, fontSize: '1.2rem', color: COLORS.green, display: 'block' }}>
-                Teezy
+                PAR-Tee
               </span>
               <span
                 style={{
@@ -187,7 +187,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             color: COLORS.gray600,
           }}
         >
-          Teezy &copy; {new Date().getFullYear()}
+          PAR-Tee &copy; {new Date().getFullYear()}
         </div>
       </aside>
 

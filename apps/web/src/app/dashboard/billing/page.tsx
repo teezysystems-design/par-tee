@@ -37,15 +37,15 @@ const TIERS: {
     tier: 'basic_promotion',
     label: 'Basic Promotion',
     feeCents: 225,
-    description: 'Teezy listed on your website and booking page',
-    requirement: 'Link to teezy.app on your website or booking system',
+    description: 'PAR-Tee listed on your website and booking page',
+    requirement: 'Link to par-tee.app on your website or booking system',
     highlight: true,
   },
   {
     tier: 'active_promotion',
     label: 'Active Promotion',
     feeCents: 200,
-    description: 'Active promotion of Teezy on-course',
+    description: 'Active promotion of PAR-Tee on-course',
     requirement: 'Signage at pro shop + staff mention to every group',
     highlight: true,
   },
@@ -53,7 +53,7 @@ const TIERS: {
     tier: 'tournament',
     label: 'Tournament Partner',
     feeCents: 175,
-    description: 'Run mini tournaments through Teezy',
+    description: 'Run mini tournaments through PAR-Tee',
     requirement: 'Host at least 1 mini tournament/month + social media post',
     highlight: true,
   },
@@ -119,7 +119,7 @@ export default function BillingPage() {
       <div style={{ marginBottom: '2rem' }}>
         <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: COLORS.gray900 }}>Billing & Pricing</h1>
         <p style={{ color: COLORS.gray600, marginTop: '0.25rem' }}>
-          Monthly invoicing via Stripe. Lower your per-booking fee by promoting Teezy.
+          Monthly invoicing via Stripe. Lower your per-booking fee by promoting PAR-Tee.
         </p>
       </div>
 
@@ -261,7 +261,7 @@ export default function BillingPage() {
               <li>Tier changes take effect at the start of the next billing cycle.</li>
             </ul>
             <p style={{ marginTop: '1rem', fontSize: '0.85rem', color: COLORS.gray600 }}>
-              Questions? Email <strong>billing@teezy.app</strong>
+              Questions? Email <strong>billing@par-tee.app</strong>
             </p>
           </div>
         </>
