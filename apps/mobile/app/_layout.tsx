@@ -62,8 +62,6 @@ function RootNavigation() {
         <Stack.Screen name="leagues/index" options={{ headerShown: false }} />
         <Stack.Screen name="tournaments/index" options={{ headerShown: false }} />
         <Stack.Screen name="rankup/index" options={{ headerShown: false }} />
-        <Stack.Screen name="notifications/index" options={{ headerShown: false }} />
-        <Stack.Screen name="notifications/preferences" options={{ headerShown: false }} />
       <Stack.Screen name="+not-found" />
     </Stack>
   );
