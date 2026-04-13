@@ -1,7 +1,7 @@
 import { Tabs } from 'expo-router';
 import { Text } from 'react-native';
 
-const PRIMARY = '#1a7f4b';
+const PRIMARY = '#1B6B3A';
 const INACTIVE = '#aaa';
 
 function TabIcon({ emoji, focused }: { emoji: string; focused: boolean }) {

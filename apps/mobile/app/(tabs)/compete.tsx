@@ -14,7 +14,7 @@ import type { LeaderboardEntry, LeaderboardType, RankTier } from '@par-tee/share
 import { RANK_TIERS, RANK_COLORS } from '@par-tee/shared';
 
 const API_URL = process.env['EXPO_PUBLIC_API_URL'] ?? 'http://localhost:4000';
-const PRIMARY = '#1a7f4b';
+const PRIMARY = '#1B6B3A';
 
 // ─── Sub-components ────────────────────────────────────────────────────────
 
@@ -123,7 +123,7 @@ export default function CompeteScreen() {
   const [loading, setLoading] = useState(true);
   const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
   const [myRank, setMyRank] = useState<{ tier: RankTier; points: number; rank: number | null }>({
-    tier: 'rookie',
+    tier: 'bronze_1',
     points: 0,
     rank: null,
   });
@@ -143,7 +143,7 @@ export default function CompeteScreen() {
       }
       if (meRes.ok) {
         const { data } = await meRes.json();
-        setMyRank({ tier: data.tier ?? 'rookie', points: data.points ?? 0, rank: data.rank ?? null });
+        setMyRank({ tier: data.tier ?? 'bronze_1', points: data.points ?? 0, rank: data.rank ?? null });
       }
     } catch {
       // Network unavailable — keep existing data
