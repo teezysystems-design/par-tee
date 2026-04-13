@@ -10,7 +10,6 @@
     "clean": "rm -rf .vercel/output"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.39.0",
     "@hono/zod-validator": "^0.2.2",
     "@par-tee/db": "*",
     "@par-tee/shared": "*",
@@ -20,8 +19,8 @@
     "zod": "^3.22.0"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20240314.0",
     "@par-tee/tsconfig": "*",
-    "typescript": "~5.3.3"
+    "@vercel/node": "^3.0.0",
+    "typescript": "^5.4.0"
   }
 }

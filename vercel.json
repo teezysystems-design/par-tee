@@ -3,5 +3,8 @@
   "outputDirectory": "apps/web/.next",
   "installCommand": "echo 'install handled in build'",
   "devCommand": "npx turbo run dev --filter=@par-tee/web",
-  "framework": null
+  "framework": null,
+  "rewrites": [
+    { "source": "/v1/:path*", "destination": "/api/:path*" }
+  ]
 }
