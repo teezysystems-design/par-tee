@@ -4,19 +4,33 @@ import { logger } from 'hono/logger';
 import { HTTPException } from 'hono/http-exception';
 
 import { authRouter } from '../src/routes/auth';
+import dashboardRouter from '../src/routes/dashboard';
 import { coursesRouter } from '../src/routes/courses';
+import dashboardRouter from '../src/routes/dashboard';
 import { teeTimesRouter } from '../src/routes/tee-times';
+import dashboardRouter from '../src/routes/dashboard';
 import { bookingsRouter } from '../src/routes/bookings';
+import dashboardRouter from '../src/routes/dashboard';
 import { roundsRouter } from '../src/routes/rounds';
+import dashboardRouter from '../src/routes/dashboard';
 import { rankingsRouter } from '../src/routes/rankings';
+import dashboardRouter from '../src/routes/dashboard';
 import { socialRouter } from '../src/routes/social';
+import dashboardRouter from '../src/routes/dashboard';
 import { leaguesRouter } from '../src/routes/leagues';
+import dashboardRouter from '../src/routes/dashboard';
 import { tournamentsRouter } from '../src/routes/tournaments';
+import dashboardRouter from '../src/routes/dashboard';
 import { billingRouter } from '../src/routes/billing';
+import dashboardRouter from '../src/routes/dashboard';
 import { paymentsRouter } from '../src/routes/payments';
+import dashboardRouter from '../src/routes/dashboard';
 import { notificationsRouter } from '../src/routes/notifications';
+import dashboardRouter from '../src/routes/dashboard';
 import { aiMatchingRouter } from '../src/routes/ai-matching';
+import dashboardRouter from '../src/routes/dashboard';
 import { usersRouter } from '../src/routes/users';
+import dashboardRouter from '../src/routes/dashboard';
 
 const app = new Hono();
 
@@ -46,6 +60,7 @@ app.get('/health', (c) =>
 
 app.route('/auth', authRouter);
 app.route('/courses', coursesRouter);
+  .route('/courses', dashboardRouter)
 app.route('/tee-times', teeTimesRouter);
 app.route('/bookings', bookingsRouter);
 app.route('/rounds', roundsRouter);
