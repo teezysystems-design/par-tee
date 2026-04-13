@@ -389,7 +389,7 @@ export default function ProfileScreen() {
       }
 
       // Fetch recent rounds and calculate stats
-      const roundsRes = await fetch(`${API_URL}/v1/rounds/me?limit=6`, {
+      const roundsRes = await fetch(`${API_URL}/v1/rounds?limit=6`, {
         headers: { Authorization: `Bearer ${session.access_token}` },
       });
       if (roundsRes.ok) {

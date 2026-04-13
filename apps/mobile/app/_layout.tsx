@@ -59,6 +59,8 @@ function RootNavigation() {
       <Stack.Screen name="party/[partyId]/index" options={{ title: 'Party Lobby', headerBackTitle: 'Back' }} />
       <Stack.Screen name="party/[partyId]/score" options={{ title: 'Score Entry', headerBackTitle: 'Lobby' }} />
       <Stack.Screen name="party/[partyId]/summary" options={{ title: 'Round Summary', headerBackTitle: 'Lobby' }} />
+      <Stack.Screen name="party/[partyId]/invite" options={{ title: 'Invite Friends', headerBackTitle: 'Lobby' }} />
+      <Stack.Screen name="rankup/index" options={{ headerShown: false, animation: 'fade' }} />
       <Stack.Screen name="+not-found" />
     </Stack>
   );

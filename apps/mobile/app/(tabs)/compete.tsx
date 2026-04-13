@@ -10,17 +10,18 @@ import {
 } from 'react-native';
 import { router } from 'expo-router';
 import { useAuth } from '../../src/context/AuthContext';
-import type { LeaderboardEntry, LeaderboardType, RankTier } from '@par-tee/shared';
-import { RANK_TIERS, RANK_COLORS } from '@par-tee/shared';
+import type { RankTier } from '@par-tee/shared/types';
+import { RANK_TIERS } from '@par-tee/shared/types';
+import { RANK_COLORS } from '@par-tee/shared/colors';
 
 const API_URL = process.env['EXPO_PUBLIC_API_URL'] ?? 'http://localhost:4000';
-const PRIMARY = '#1a7f4b';
+const PRIMARY = '#1B6B3A';
 
 // ─── Sub-components ────────────────────────────────────────────────────────
 
 function RankBadge({ tier, size = 'md' }: { tier: RankTier; size?: 'sm' | 'md' | 'lg' }) {
   const info = RANK_TIERS.find((r) => r.tier === tier);
-  const colors = RANK_COLORS[tier];
+  const colors = RANK_COLORS[tier] ?? RANK_COLORS.bronze_1;
   const dim = size === 'lg' ? 72 : size === 'md' ? 48 : 32;
   const iconSize = size === 'lg' ? 28 : size === 'md' ? 20 : 14;
   const labelSize = size === 'lg' ? 13 : size === 'md' ? 11 : 9;
@@ -38,7 +39,7 @@ function RankBadge({ tier, size = 'md' }: { tier: RankTier; size?: 'sm' | 'md' |
         },
       ]}
     >
-      <Text style={{ fontSize: iconSize }}>{info?.icon ?? '🌱'}</Text>
+      <Text style={{ fontSize: iconSize }}>{info?.icon ?? '🥉'}</Text>
       {size !== 'sm' && (
         <Text style={[styles.badgeLabel, { color: colors.text, fontSize: labelSize }]}>
           {info?.label}
@@ -54,13 +55,14 @@ function RankProgressBar({ tier, points }: { tier: RankTier; points: number }) {
   const { minPoints, maxPoints } = info;
   const range = maxPoints != null ? maxPoints - minPoints : 1000;
   const progress = Math.min((points - minPoints) / range, 1);
-  const nextTier = RANK_TIERS.find((r) => r.minPoints === maxPoints);
+  const nextTier = RANK_TIERS.find((r) => r.minPoints === (maxPoints != null ? maxPoints + 1 : null));
+  const nextTierByIdx = RANK_TIERS[RANK_TIERS.indexOf(info) + 1];
 
   return (
     <View style={styles.progressContainer}>
       <View style={styles.progressRow}>
         <Text style={styles.progressLabel}>{info.label}</Text>
-        {nextTier && <Text style={styles.progressLabel}>{nextTier.label}</Text>}
+        {nextTierByIdx && <Text style={styles.progressLabel}>{nextTierByIdx.label}</Text>}
       </View>
       <View style={styles.progressTrack}>
         <View
@@ -68,21 +70,35 @@ function RankProgressBar({ tier, points }: { tier: RankTier; points: number }) {
             styles.progressFill,
             {
               width: `${progress * 100}%` as `${number}%`,
-              backgroundColor: RANK_COLORS[tier].border,
+              backgroundColor: (RANK_COLORS[tier] ?? RANK_COLORS.bronze_1).border,
             },
           ]}
         />
       </View>
       <Text style={styles.progressPoints}>
         {points.toLocaleString()} pts
-        {maxPoints != null && ` · ${(maxPoints - points).toLocaleString()} to ${nextTier?.label ?? 'Max'}`}
+        {maxPoints != null && nextTierByIdx && ` · ${(maxPoints + 1 - points).toLocaleString()} to ${nextTierByIdx.label}`}
       </Text>
     </View>
   );
 }
 
+interface LeaderboardEntry {
+  rank: number;
+  userId: string;
+  userName: string;
+  username: string | null;
+  avatarUrl: string | null;
+  tier: RankTier;
+  points: number;
+  wins: number;
+  losses: number;
+  avgScore: number | null;
+  roundsPlayed: number;
+}
+
 function LeaderboardRow({ entry, isMe }: { entry: LeaderboardEntry; isMe: boolean }) {
-  const colors = RANK_COLORS[entry.tier];
+  const colors = RANK_COLORS[entry.tier] ?? RANK_COLORS.bronze_1;
   return (
     <View style={[styles.row, isMe && styles.rowHighlight]}>
       <Text style={[styles.rowRank, isMe && { color: PRIMARY }]}>
@@ -98,8 +114,8 @@ function LeaderboardRow({ entry, isMe }: { entry: LeaderboardEntry; isMe: boolea
           {entry.userName}
         </Text>
         <Text style={styles.rowSub}>
-          {entry.wins}W · {entry.losses}L
-          {entry.avgScore != null ? `  avg ${entry.avgScore.toFixed(1)}` : ''}
+          {entry.roundsPlayed} rounds · {entry.wins}W
+          {entry.avgScore != null ? ` · avg ${entry.avgScore.toFixed(1)}` : ''}
         </Text>
       </View>
       <View style={styles.rowRight}>
@@ -114,7 +130,7 @@ function LeaderboardRow({ entry, isMe }: { entry: LeaderboardEntry; isMe: boolea
 
 // ─── Main Screen ───────────────────────────────────────────────────────────
 
-type Tab = LeaderboardType;
+type Tab = 'main' | '1v1' | '2v2';
 
 export default function CompeteScreen() {
   const { session } = useAuth();
@@ -122,11 +138,14 @@ export default function CompeteScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [loading, setLoading] = useState(true);
   const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
-  const [myRank, setMyRank] = useState<{ tier: RankTier; points: number; rank: number | null }>({
-    tier: 'rookie',
+  const [myRank, setMyRank] = useState<{ tier: RankTier; points: number; rank: number | null; roundsPlayed: number; wins: number }>({
+    tier: 'bronze_1',
     points: 0,
     rank: null,
+    roundsPlayed: 0,
+    wins: 0,
   });
+  const [myProfileId, setMyProfileId] = useState<string | null>(null);
 
   const fetchData = useCallback(async (tab: Tab) => {
     if (!session?.access_token) return;
@@ -138,12 +157,26 @@ export default function CompeteScreen() {
         fetch(`${API_URL}/v1/rankings/me?type=${tab}`, { headers }),
       ]);
       if (lbRes.ok) {
-        const { data } = await lbRes.json();
-        setEntries(data ?? []);
+        const json = await lbRes.json();
+        setEntries(json.data ?? []);
       }
       if (meRes.ok) {
-        const { data } = await meRes.json();
-        setMyRank({ tier: data.tier ?? 'rookie', points: data.points ?? 0, rank: data.rank ?? null });
+        const json = await meRes.json();
+        const d = json.data;
+        setMyRank({
+          tier: d?.tier ?? 'bronze_1',
+          points: d?.points ?? 0,
+          rank: d?.rank ?? null,
+          roundsPlayed: d?.roundsPlayed ?? 0,
+          wins: d?.wins ?? 0,
+        });
+      }
+
+      // Get profile ID for highlighting
+      const profileRes = await fetch(`${API_URL}/v1/users/me`, { headers });
+      if (profileRes.ok) {
+        const pj = await profileRes.json();
+        setMyProfileId(pj.data?.id ?? null);
       }
     } catch {
       // Network unavailable — keep existing data
@@ -174,19 +207,12 @@ export default function CompeteScreen() {
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={PRIMARY} />
       }
     >
-      {/* Header ----------------------------------------------------------- */}
+      {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Compete</Text>
-        <TouchableOpacity
-          style={styles.scoreBtn}
-          onPress={() => router.push('/score-entry')}
-          activeOpacity={0.8}
-        >
-          <Text style={styles.scoreBtnText}>+ Log Score</Text>
-        </TouchableOpacity>
       </View>
 
-      {/* My Rank Card ------------------------------------------------------ */}
+      {/* My Rank Card */}
       <View style={styles.myRankCard}>
         <View style={styles.myRankLeft}>
           <RankBadge tier={myRank.tier} size="lg" />
@@ -195,25 +221,28 @@ export default function CompeteScreen() {
             <Text style={styles.myRankPos}>
               {myRank.rank != null ? `#${myRank.rank} globally` : 'Unranked'}
             </Text>
+            <Text style={styles.myRankStats}>
+              {myRank.roundsPlayed} rounds · {myRank.wins} wins
+            </Text>
             <RankProgressBar tier={myRank.tier} points={myRank.points} />
           </View>
         </View>
       </View>
 
-      {/* Quick Actions ----------------------------------------------------- */}
+      {/* Quick Actions */}
       <View style={styles.quickRow}>
         <TouchableOpacity
           style={[styles.quickCard, { backgroundColor: '#fff7ed', borderColor: '#fb923c' }]}
-          onPress={() => router.push('/leagues')}
+          onPress={() => router.push('/leagues' as never)}
           activeOpacity={0.8}
         >
           <Text style={styles.quickIcon}>🏅</Text>
           <Text style={styles.quickLabel}>Leagues</Text>
-          <Text style={styles.quickSub}>Season active</Text>
+          <Text style={styles.quickSub}>Join a league</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.quickCard, { backgroundColor: '#f0fdf4', borderColor: '#86efac' }]}
-          onPress={() => router.push('/tournaments')}
+          onPress={() => router.push('/tournaments' as never)}
           activeOpacity={0.8}
         >
           <Text style={styles.quickIcon}>🎖️</Text>
@@ -222,7 +251,7 @@ export default function CompeteScreen() {
         </TouchableOpacity>
       </View>
 
-      {/* Leaderboard ------------------------------------------------------ */}
+      {/* Leaderboard */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Leaderboard</Text>
 
@@ -234,9 +263,7 @@ export default function CompeteScreen() {
               style={[styles.tabBtn, activeTab === t.id && styles.tabBtnActive]}
               onPress={() => setActiveTab(t.id)}
             >
-              <Text
-                style={[styles.tabBtnText, activeTab === t.id && styles.tabBtnTextActive]}
-              >
+              <Text style={[styles.tabBtnText, activeTab === t.id && styles.tabBtnTextActive]}>
                 {t.label}
               </Text>
             </TouchableOpacity>
@@ -246,42 +273,54 @@ export default function CompeteScreen() {
         {loading ? (
           <ActivityIndicator color={PRIMARY} style={{ marginTop: 32 }} />
         ) : entries.length === 0 ? (
-          <Text style={styles.emptyText}>No rankings yet — play some rounds to earn points!</Text>
+          <View style={styles.emptyBox}>
+            <Text style={styles.emptyEmoji}>🏌️</Text>
+            <Text style={styles.emptyText}>No rankings yet</Text>
+            <Text style={styles.emptySub}>Play rounds to earn points and climb the leaderboard!</Text>
+          </View>
         ) : (
           <View style={styles.table}>
             {entries.map((entry) => (
               <LeaderboardRow
-                key={entry.userId}
+                key={`${entry.userId}-${entry.rank}`}
                 entry={entry}
-                isMe={entry.userId === session?.user?.id}
+                isMe={entry.userId === myProfileId}
               />
             ))}
           </View>
         )}
       </View>
 
-      {/* Rank Tiers Reference --------------------------------------------- */}
+      {/* Rank Tiers Reference */}
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Rank Tiers</Text>
+        <Text style={styles.sectionTitle}>All 18 Rank Tiers</Text>
+        <Text style={styles.sectionSub}>Earn points by playing rounds. Mode multipliers: Solo 1×, 1v1 1.5×, 2v2 1.3×, Tournament 2×</Text>
         <View style={styles.tiersGrid}>
           {RANK_TIERS.map((info) => {
-            const colors = RANK_COLORS[info.tier];
+            const colors = RANK_COLORS[info.tier] ?? RANK_COLORS.bronze_1;
+            const isCurrentTier = info.tier === myRank.tier;
             return (
               <View
                 key={info.tier}
                 style={[
                   styles.tierChip,
                   { backgroundColor: colors.bg, borderColor: colors.border },
+                  isCurrentTier && styles.tierChipCurrent,
                 ]}
               >
                 <Text style={{ fontSize: 16 }}>{info.icon}</Text>
-                <View style={{ marginLeft: 8 }}>
+                <View style={{ marginLeft: 8, flex: 1 }}>
                   <Text style={[styles.tierLabel, { color: colors.text }]}>{info.label}</Text>
                   <Text style={styles.tierPts}>
                     {info.minPoints.toLocaleString()}
                     {info.maxPoints != null ? `–${info.maxPoints.toLocaleString()}` : '+'} pts
                   </Text>
                 </View>
+                {isCurrentTier && (
+                  <View style={styles.youBadge}>
+                    <Text style={styles.youBadgeText}>YOU</Text>
+                  </View>
+                )}
               </View>
             );
           })}
@@ -308,13 +347,6 @@ const styles = StyleSheet.create({
     borderBottomColor: '#e5e7eb',
   },
   headerTitle: { fontSize: 26, fontWeight: '800', color: '#111' },
-  scoreBtn: {
-    backgroundColor: PRIMARY,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-  },
-  scoreBtnText: { color: '#fff', fontSize: 14, fontWeight: '700' },
 
   // My rank card
   myRankCard: {
@@ -331,6 +363,7 @@ const styles = StyleSheet.create({
   myRankLeft: { flexDirection: 'row', alignItems: 'center' },
   myRankTitle: { fontSize: 12, fontWeight: '600', color: '#9ca3af', textTransform: 'uppercase', letterSpacing: 0.8 },
   myRankPos: { fontSize: 22, fontWeight: '800', color: '#111', marginVertical: 2 },
+  myRankStats: { fontSize: 12, color: '#6b7280', marginBottom: 4 },
 
   // Badge
   badge: {
@@ -388,8 +421,14 @@ const styles = StyleSheet.create({
     shadowRadius: 6,
     elevation: 1,
   },
-  sectionTitle: { fontSize: 17, fontWeight: '800', color: '#111', marginBottom: 12 },
-  emptyText: { fontSize: 14, color: '#9ca3af', textAlign: 'center', paddingVertical: 24 },
+  sectionTitle: { fontSize: 17, fontWeight: '800', color: '#111', marginBottom: 4 },
+  sectionSub: { fontSize: 12, color: '#9ca3af', marginBottom: 12, lineHeight: 16 },
+
+  // Empty
+  emptyBox: { alignItems: 'center', paddingVertical: 32 },
+  emptyEmoji: { fontSize: 48, marginBottom: 12 },
+  emptyText: { fontSize: 16, fontWeight: '700', color: '#374151' },
+  emptySub: { fontSize: 13, color: '#9ca3af', textAlign: 'center', marginTop: 4 },
 
   // Tabs
   tabs: {
@@ -398,6 +437,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 3,
     marginBottom: 12,
+    marginTop: 8,
   },
   tabBtn: { flex: 1, paddingVertical: 7, borderRadius: 9, alignItems: 'center' },
   tabBtnActive: { backgroundColor: '#fff', shadowColor: '#000', shadowOpacity: 0.08, shadowOffset: { width: 0, height: 1 }, shadowRadius: 3, elevation: 2 },
@@ -414,7 +454,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     gap: 10,
   },
-  rowHighlight: { backgroundColor: '#f0fdf4' },
+  rowHighlight: { backgroundColor: '#e8f5ee' },
   rowRank: { width: 28, fontSize: 14, fontWeight: '700', color: '#6b7280', textAlign: 'center' },
   rowAvatar: {
     width: 36,
@@ -439,6 +479,21 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 1.5,
   },
+  tierChipCurrent: {
+    borderWidth: 2.5,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 6,
+    elevation: 3,
+  },
   tierLabel: { fontSize: 14, fontWeight: '700' },
   tierPts: { fontSize: 11, color: '#9ca3af', marginTop: 1 },
+  youBadge: {
+    backgroundColor: PRIMARY,
+    borderRadius: 6,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+  },
+  youBadgeText: { color: '#fff', fontSize: 10, fontWeight: '800' },
 });
