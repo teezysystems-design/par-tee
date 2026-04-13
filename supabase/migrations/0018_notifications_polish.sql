@@ -41,8 +41,8 @@ ALTER TABLE push_tokens ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Users can manage their own push tokens" ON push_tokens;
 CREATE POLICY "Users can manage their own push tokens"
   ON push_tokens FOR ALL
-  USING (user_id IN (SELECT id FROM users WHERE supabase_user_id = auth.uid()))
-  WITH CHECK (user_id IN (SELECT id FROM users WHERE supabase_user_id = auth.uid()));
+  USING (user_id IN (SELECT id FROM users WHERE supabase_user_id::text = auth.uid()::text))
+  WITH CHECK (user_id IN (SELECT id FROM users WHERE supabase_user_id::text = auth.uid()::text));
 
 -- ============================================================
 -- 3. Notification preferences table
@@ -72,8 +72,8 @@ DROP POLICY IF EXISTS "Users can manage their own notification preferences"
   ON notification_preferences;
 CREATE POLICY "Users can manage their own notification preferences"
   ON notification_preferences FOR ALL
-  USING (user_id IN (SELECT id FROM users WHERE supabase_user_id = auth.uid()))
-  WITH CHECK (user_id IN (SELECT id FROM users WHERE supabase_user_id = auth.uid()));
+  USING (user_id IN (SELECT id FROM users WHERE supabase_user_id::text = auth.uid()::text))
+  WITH CHECK (user_id IN (SELECT id FROM users WHERE supabase_user_id::text = auth.uid()::text));
 
 -- ============================================================
 -- 4. Auto-create preferences for new users
