@@ -1,11 +1,13 @@
 import { useEffect, useRef } from 'react';
 import { Stack, router, useSegments } from 'expo-router';
 import { AuthProvider, useAuth } from '../src/context/AuthContext';
+import { usePushNotifications } from '../src/context/usePushNotifications';
 
 const API_URL = process.env['EXPO_PUBLIC_API_URL'] ?? 'http://localhost:4000';
 
 function RootNavigation() {
   const { session, loading } = useAuth();
+  usePushNotifications();
   const segments = useSegments();
   const profileChecked = useRef<string | null>(null);
 
